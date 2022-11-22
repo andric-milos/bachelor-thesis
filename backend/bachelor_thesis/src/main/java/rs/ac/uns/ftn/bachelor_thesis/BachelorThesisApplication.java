@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
+import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
 import rs.ac.uns.ftn.bachelor_thesis.service.UserService;
 
 import java.util.ArrayList;
@@ -22,6 +23,11 @@ public class BachelorThesisApplication {
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	TokenUtil tokenUtil() {
+		return new TokenUtil();
 	}
 
 	@Bean

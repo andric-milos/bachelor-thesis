@@ -1,7 +1,5 @@
 package rs.ac.uns.ftn.bachelor_thesis.security;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,18 +15,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
+    private final TokenUtil tokenUtil;
 
-    public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public CustomAuthenticationFilter(AuthenticationManager authenticationManager, TokenUtil tokenUtil) {
         this.authenticationManager = authenticationManager;
+        this.tokenUtil = tokenUtil;
     }
 
     @Override
@@ -52,20 +50,16 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
         User user = (User) authentication.getPrincipal(); // org.springframework.security.core.userdetails.User class
 
-        Algorithm algorithm = Algorithm.HMAC256("secret".getBytes()); // Algorithm used for signing jwts
+        String accessToken = tokenUtil.generateAccessToken(
+                user.getUsername(),
+                request.getRequestURL().toString(),
+                user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())
+        );
 
-        String accessToken = JWT.create()
-                .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000)) // 10 minutes
-                .withIssuer(request.getRequestURL().toString())
-                .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-                .sign(algorithm);
-
-        String refreshToken = JWT.create()
-                .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000)) // 30 minutes
-                .withIssuer(request.getRequestURL().toString())
-                .sign(algorithm);
+        String refreshToken = tokenUtil.generateRefreshToken(
+                user.getUsername(),
+                request.getRequestURL().toString()
+        );
 
         /*
         response.setHeader("access_token", accessToken);
