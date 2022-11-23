@@ -10,8 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
-import rs.ac.uns.ftn.bachelor_thesis.repoository.RoleRepository;
-import rs.ac.uns.ftn.bachelor_thesis.repoository.UserRepository;
+import rs.ac.uns.ftn.bachelor_thesis.repository.RoleRepository;
+import rs.ac.uns.ftn.bachelor_thesis.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -78,5 +78,9 @@ public class UserService implements UserDetailsService {
     public List<User> getAllUsers() {
         log.info("Fetching all users from the database");
         return userRepository.findAll();
+    }
+
+    public Role getRoleByName(String roleName) {
+        return roleRepository.findByName(roleName);
     }
 }

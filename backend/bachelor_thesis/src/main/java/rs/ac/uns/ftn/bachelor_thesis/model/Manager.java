@@ -8,15 +8,8 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
 @Entity
-@Table(name = "managers")
-public class Manager {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
-
+public class Manager extends User {
     @OneToOne
     @JoinColumn(name = "sports_facility_id")
     private SportsFacility sportsFacility;

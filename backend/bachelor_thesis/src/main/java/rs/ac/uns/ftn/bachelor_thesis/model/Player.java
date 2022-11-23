@@ -9,15 +9,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
 @Entity
-@Table(name = "players")
-public class Player {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
-
+public class Player extends User {
     private int numberOfGoals; /* Overall number of goals scored in all games in all appointments.
     Calculated: length/size of the set of goals. */
     private int numberOfGames; // Overall number of games played in all appointments.

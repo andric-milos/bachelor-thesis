@@ -3,13 +3,20 @@ package rs.ac.uns.ftn.bachelor_thesis.controller;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.UserRoleDTO;
+import rs.ac.uns.ftn.bachelor_thesis.model.Manager;
+import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
+import rs.ac.uns.ftn.bachelor_thesis.service.ManagerService;
+import rs.ac.uns.ftn.bachelor_thesis.service.PlayerService;
 import rs.ac.uns.ftn.bachelor_thesis.service.UserService;
+import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +33,9 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 public class UserController {
     private final UserService userService;
     private final TokenUtil tokenUtil;
+    private final PlayerService playerService;
+    private final ValidationUtil validationUtil;
+    private final ManagerService managerService;
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
@@ -85,5 +95,32 @@ public class UserController {
         } else {
             throw new RuntimeException("Refresh token is missing!");
         }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterInfoDTO dto) {
+        // Role whitelisted values: "manager", "player"
+
+        dto = validationUtil.trimAndValidateRegisterInfo(dto);
+
+        if (dto.getRole().equals("player")) {
+            Player player = playerService.registerPlayer(dto);
+
+            if (player == null) { // Role not found
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            return new ResponseEntity<>(player, HttpStatus.OK); // return maybe CREATED, not OK? And return DTO instead od Player class?
+        } else if (dto.getRole().equals("manager")) {
+            Manager manager = managerService.registerManager(dto);
+
+            if (manager == null) {  // Role note found
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            return new ResponseEntity<>(manager, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }
