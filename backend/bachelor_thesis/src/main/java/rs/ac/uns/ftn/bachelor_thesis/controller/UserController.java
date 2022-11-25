@@ -103,22 +103,30 @@ public class UserController {
 
         dto = validationUtil.trimAndValidateRegisterInfo(dto);
 
+        if (dto == null) {
+            return new ResponseEntity<>("Invalid input of data!" , HttpStatus.BAD_REQUEST);
+        }
+
         if (dto.getRole().equals("player")) {
-            Player player = playerService.registerPlayer(dto);
+            int status = playerService.registerPlayer(dto);
 
-            if (player == null) { // Role not found
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            if (status == 1) {
+                return new ResponseEntity<>("Role \"Player\" not found in the database!", HttpStatus.INTERNAL_SERVER_ERROR);
+            } else if (status == 2) {
+                return new ResponseEntity<>("Email " + dto.getEmail() + " is already taken!" , HttpStatus.BAD_REQUEST);
             }
 
-            return new ResponseEntity<>(player, HttpStatus.OK); // return maybe CREATED, not OK? And return DTO instead od Player class?
+            return new ResponseEntity<>(HttpStatus.OK); // return maybe CREATED, not OK? And return DTO instead od Player class?
         } else if (dto.getRole().equals("manager")) {
-            Manager manager = managerService.registerManager(dto);
+            int status = managerService.registerManager(dto);
 
-            if (manager == null) {  // Role note found
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            if (status == 1) {
+                return new ResponseEntity<>("Role \"Player\" not found in the database!" , HttpStatus.INTERNAL_SERVER_ERROR);
+            } else if (status == 2) {
+                return new ResponseEntity<>("Email " + dto.getEmail() + " is already taken!" , HttpStatus.BAD_REQUEST);
             }
 
-            return new ResponseEntity<>(manager, HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

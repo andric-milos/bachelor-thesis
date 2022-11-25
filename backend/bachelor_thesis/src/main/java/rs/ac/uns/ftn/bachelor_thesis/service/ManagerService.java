@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.model.Manager;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
+import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.repository.ManagerRepository;
 
 @Slf4j
@@ -17,7 +18,15 @@ public class ManagerService {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
-    public Manager registerManager(RegisterInfoDTO dto) {
+    /**
+     * Receives previously validated RegisterInfoDTO object, creates Manager object
+     * from it and saves it in the database.
+     *
+     * @param dto
+     * @return 0 if manager is successfully registered, 1 if role is
+     * not found in the database, 2 if email is already taken
+     */
+    public int registerManager(RegisterInfoDTO dto) {
         log.info("Registering a new manager: {}", dto.getEmail());
 
         Manager manager = new Manager();
@@ -28,13 +37,18 @@ public class ManagerService {
         manager.setTelephone(dto.getTelephone());
 
         Role roleManager = userService.getRoleByName("ROLE_MANAGER");
-
         if (roleManager == null) {
-            return null;
+            return 1;
+        }
+
+        User user = userService.getUserByEmail(dto.getEmail());
+        if (user != null) {
+            return 2;
         }
 
         manager.getRoles().add(roleManager);
+        managerRepository.save(manager);
 
-        return managerRepository.save(manager);
+        return 0;
     }
 }
