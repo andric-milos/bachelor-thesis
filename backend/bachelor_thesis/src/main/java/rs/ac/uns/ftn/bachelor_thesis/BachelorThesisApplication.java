@@ -6,10 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
+import rs.ac.uns.ftn.bachelor_thesis.security.CustomCorsFilter;
 import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
 import rs.ac.uns.ftn.bachelor_thesis.service.PlayerService;
 import rs.ac.uns.ftn.bachelor_thesis.service.UserService;
@@ -37,6 +39,11 @@ public class BachelorThesisApplication {
 	@Bean
 	ValidationUtil validationUtil() {
 		return new ValidationUtil();
+	}
+
+	@Bean
+	WebMvcConfigurer webMvcConfigurer() {
+		return new CustomCorsFilter();
 	}
 
 	@Bean
