@@ -5,7 +5,6 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 
 import java.util.Date;
 import java.util.List;
@@ -37,5 +36,13 @@ public class TokenUtil {
     public DecodedJWT verify(String token) {
         JWTVerifier verifier = JWT.require(ALGORITHM).build();
         return verifier.verify(token);
+    }
+
+    public String getToken(String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring("Bearer ".length());
+        }
+
+        return null;
     }
 }

@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.bachelor_thesis.service;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,10 +13,12 @@ import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.repository.RoleRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.UserRepository;
+import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenUtil tokenUtil;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -82,5 +86,18 @@ public class UserService implements UserDetailsService {
 
     public Role getRoleByName(String roleName) {
         return roleRepository.findByName(roleName);
+    }
+
+    public String renewToken(String refreshToken, String issuer) {
+        DecodedJWT decodedJWT = tokenUtil.verify(refreshToken);
+
+        String email = decodedJWT.getSubject();
+        User user = getUserByEmail(email);
+
+        return tokenUtil.generateAccessToken(
+                user.getEmail(),
+                issuer,
+                user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
+        );
     }
 }

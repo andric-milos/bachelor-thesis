@@ -1,15 +1,11 @@
 package rs.ac.uns.ftn.bachelor_thesis.controller;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.UserRoleDTO;
-import rs.ac.uns.ftn.bachelor_thesis.model.Manager;
-import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
@@ -19,10 +15,7 @@ import rs.ac.uns.ftn.bachelor_thesis.service.UserService;
 import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -61,40 +54,26 @@ public class UserController {
     }
 
     @GetMapping("/token/renew")
-    public void renewToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ResponseEntity<?> renewToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
+        String refreshToken = tokenUtil.getToken(authorizationHeader);
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+        if (refreshToken != null) {
             try {
-                String refresh_token = authorizationHeader.substring("Bearer ".length());
-                DecodedJWT decodedJWT = tokenUtil.verify(refresh_token);
-
-                String email = decodedJWT.getSubject();
-                User user = userService.getUserByEmail(email);
-
-                String access_token = tokenUtil.generateAccessToken(
-                        user.getEmail(),
-                        request.getRequestURL().toString(),
-                        user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
-                );
+                String accessToken = userService.renewToken(refreshToken, request.getRequestURL().toString());
 
                 Map<String, String> tokens = new HashMap<>();
-                tokens.put("access_token", access_token);
-                tokens.put("refresh_token", refresh_token);
+                tokens.put("access_token", accessToken);
+                tokens.put("refresh_token", refreshToken);
 
-                response.setContentType("application/json");
-                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+                return new ResponseEntity<>(tokens, HttpStatus.OK);
             } catch (Exception e) {
-                Map<String, String> error = new HashMap<>();
-                error.put("error_message", e.getMessage());
-
-                response.setStatus(FORBIDDEN.value());
-                response.setContentType("application/json");
-                new ObjectMapper().writeValue(response.getOutputStream(), error);
+                e.printStackTrace();
+                return new ResponseEntity<>(e.getMessage(), FORBIDDEN);
             }
-        } else {
-            throw new RuntimeException("Refresh token is missing!");
         }
+
+        return new ResponseEntity<>("Refresh token is missing!", HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/register")
