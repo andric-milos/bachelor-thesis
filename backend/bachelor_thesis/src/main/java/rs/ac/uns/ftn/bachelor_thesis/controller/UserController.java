@@ -1,9 +1,11 @@
 package rs.ac.uns.ftn.bachelor_thesis.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.ac.uns.ftn.bachelor_thesis.dto.LoginInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.UserRoleDTO;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
@@ -20,6 +22,7 @@ import java.util.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/user")
 @RequiredArgsConstructor
@@ -51,6 +54,13 @@ public class UserController {
         userService.addRoleToUser(dto.getUserEmail(), dto.getRoleName());
         return ResponseEntity.ok().build();
         // refactor this userService.addRoleToUser method to return feedback if the method is executed successfully.
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginInfoDTO dto, HttpServletRequest request) {
+        log.info("Email: {}, Password: {}", dto.getEmail(), dto.getPassword());
+        HashMap<String, String> tokens = userService.login(dto, request.getRequestURL().toString());
+        return new ResponseEntity<>(tokens, HttpStatus.OK);
     }
 
     @GetMapping("/token/renew")
