@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.bachelor_thesis.dto.LoginInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.TokensDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.UserRoleDTO;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
@@ -59,8 +60,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginInfoDTO dto, HttpServletRequest request) {
         log.info("Email: {}, Password: {}", dto.getEmail(), dto.getPassword());
-        HashMap<String, String> tokens = userService.login(dto, request.getRequestURL().toString());
-        return new ResponseEntity<>(tokens, HttpStatus.OK);
+        TokensDTO tokensDTO = userService.login(dto, request.getRequestURL().toString());
+        return new ResponseEntity<>(tokensDTO, HttpStatus.OK);
     }
 
     @GetMapping("/token/renew")

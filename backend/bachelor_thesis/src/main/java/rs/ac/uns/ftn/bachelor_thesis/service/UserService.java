@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.bachelor_thesis.dto.LoginInfoDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.TokensDTO;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.repository.RoleRepository;
@@ -79,7 +80,7 @@ public class UserService{
         );
     }
 
-    public HashMap<String, String> login(LoginInfoDTO dto, String issuer) {
+    public TokensDTO login(LoginInfoDTO dto, String issuer) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         dto.getEmail(),
@@ -107,6 +108,11 @@ public class UserService{
         tokens.put("access_token", accessToken);
         tokens.put("refresh_token", refreshToken);
 
-        return tokens;
+        DecodedJWT decodedJWT = tokenUtil.verify(accessToken);
+        String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+
+        TokensDTO tokensDTO = new TokensDTO(accessToken, refreshToken, dto.getEmail(), issuer, roles, decodedJWT.getExpiresAt().getTime());
+
+        return tokensDTO;
     }
 }
