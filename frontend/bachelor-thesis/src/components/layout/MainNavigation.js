@@ -31,6 +31,9 @@ function MainNavigation() {
                         <Link to='/login'>Login</Link>
                     </li>
                     <li>
+                        <Link to='/profile'>Profile</Link>
+                    </li>
+                    <li>
                         <button type='button' className='btn btn-dark' onClick={logout}>Logout</button>
                     </li>
                 </ul>
