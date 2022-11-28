@@ -10,6 +10,9 @@ import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.repository.PlayerRepository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -17,6 +20,18 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+
+    public List<Player> getAllPlayers() {
+        return playerRepository.findAll();
+    }
+
+    public Optional<Player> getPlayerByEmail(String email) {
+        return playerRepository.findByEmail(email);
+    }
+
+    public Optional<Player> getPlayerById(Long id) {
+        return playerRepository.findById(id);
+    }
 
     /**
      * Receives previously validated RegisterInfoDTO object, creates Player object

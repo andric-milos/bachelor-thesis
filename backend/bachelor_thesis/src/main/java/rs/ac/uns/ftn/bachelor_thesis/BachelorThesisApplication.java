@@ -8,16 +8,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
-import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
-import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.security.CustomCorsFilter;
 import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
 import rs.ac.uns.ftn.bachelor_thesis.service.PlayerService;
 import rs.ac.uns.ftn.bachelor_thesis.service.UserService;
 import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
-
-import java.util.ArrayList;
 
 @SpringBootApplication
 public class BachelorThesisApplication {
@@ -52,21 +48,17 @@ public class BachelorThesisApplication {
 			userService.saveRole(new Role(null, "ROLE_PLAYER"));
 			userService.saveRole(new Role(null, "ROLE_MANAGER"));
 
-			/*
-			userService.saveUser(new User(null, "John", "Doe", "john@gmail.com", "1234", "060123456", new ArrayList<>()));
-			userService.saveUser(new User(null, "John", "Travolta", "johntravolta@gmail.com", "1234", "060123456", new ArrayList<>()));
+			RegisterInfoDTO dto = new RegisterInfoDTO("Milos", "Andric", "andric8@gmail.com", "1234", "060123456", "player");
 
-			userService.addRoleToUser("john@gmail.com", "ROLE_PLAYER");
-			userService.addRoleToUser("johntravolta@gmail.com", "ROLE_MANAGER");
-			 */
+			playerService.registerPlayer(dto);
 
-			RegisterInfoDTO dto = new RegisterInfoDTO();
-			dto.setFirstName("Milos");
-			dto.setLastName("Andric");
-			dto.setPassword("1234");
-			dto.setEmail("andric8@gmail.com");
-			dto.setTelephone("060123456");
-
+			dto = new RegisterInfoDTO("John", "Doe", "johndoe@gmail.com", "1234", "060111111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("John", "Travolta", "travolta@gmail.com", "1234", "060112111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Paul", "Scholes", "scholes@gmail.com", "1234", "060111151", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Karim", "Benzema", "benzema@gmail.com", "1234", "060114111", "player");
 			playerService.registerPlayer(dto);
 		};
 	}
