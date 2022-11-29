@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import rs.ac.uns.ftn.bachelor_thesis.dto.PlayerDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.PlayerWithStatisticsDTO;
 import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.service.PlayerService;
 
@@ -40,7 +41,8 @@ public class PlayerController {
         if (playerOptional.isPresent()) {
             Player player = playerOptional.get();
 
-            return new ResponseEntity<>(new PlayerDTO(player), HttpStatus.OK);
+            // return new ResponseEntity<>(new PlayerDTO(player), HttpStatus.OK);
+            return new ResponseEntity<>(new PlayerWithStatisticsDTO(player), HttpStatus.OK);
         }
 
         return new ResponseEntity<>("Player with email " + email + " doesn't exists!", HttpStatus.BAD_REQUEST);
