@@ -60,6 +60,38 @@ public class BachelorThesisApplication {
 			playerService.registerPlayer(dto);
 			dto = new RegisterInfoDTO("Karim", "Benzema", "benzema@gmail.com", "1234", "060114111", "player");
 			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Kevin", "De Bruyne", "kdb@gmail.com", "1234", "060111111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Luka", "Modrić", "lukamodric@gmail.com", "1234", "060112111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Petar", "Petrovic", "ppetrovic@gmail.com", "1234", "060111151", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Marko", "Markovic", "markovic@gmail.com", "1234", "060114111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Mitar", "Mitrovic", "mitar@gmail.com", "1234", "060111111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Aleksandar", "Mitrovic", "mitrovic@gmail.com", "1234", "060112111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Benjamin", "Sesko", "sesko@gmail.com", "1234", "060111151", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Petar", "Popovic", "petarpopovic@gmail.com", "1234", "060114111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Nikola", "Nikolic", "nikolic@gmail.com", "1234", "060111111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Aleksandar", "Pesic", "apesic@gmail.com", "1234", "060112111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Nikola", "Stojanovic", "nstojanovic@gmail.com", "1234", "060111151", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Vuk", "Vukovic", "vukvuk@gmail.com", "1234", "060114111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Vladimir", "Pantic", "vpantic@gmail.com", "1234", "060111111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Jovan", "Jovanovic", "jovanjovanovic@gmail.com", "1234", "060112111", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Jovan", "Vukotic", "jvukotic@gmail.com", "1234", "060111151", "player");
+			playerService.registerPlayer(dto);
+			dto = new RegisterInfoDTO("Petar", "Pantic", "petarpantic@gmail.com", "1234", "060114111", "player");
+			playerService.registerPlayer(dto);
 		};
 	}
 }
