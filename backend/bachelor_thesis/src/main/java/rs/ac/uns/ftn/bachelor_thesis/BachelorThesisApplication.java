@@ -11,6 +11,7 @@ import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.security.CustomCorsFilter;
 import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
+import rs.ac.uns.ftn.bachelor_thesis.service.ManagerService;
 import rs.ac.uns.ftn.bachelor_thesis.service.PlayerService;
 import rs.ac.uns.ftn.bachelor_thesis.service.UserService;
 import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
@@ -43,7 +44,7 @@ public class BachelorThesisApplication {
 	}
 
 	@Bean
-	CommandLineRunner run(UserService userService, PlayerService playerService) {
+	CommandLineRunner run(UserService userService, PlayerService playerService, ManagerService managerService) {
 		return args -> {
 			userService.saveRole(new Role(null, "ROLE_PLAYER"));
 			userService.saveRole(new Role(null, "ROLE_MANAGER"));
@@ -92,6 +93,9 @@ public class BachelorThesisApplication {
 			playerService.registerPlayer(dto);
 			dto = new RegisterInfoDTO("Petar", "Pantic", "petarpantic@gmail.com", "1234", "060114111", "player");
 			playerService.registerPlayer(dto);
+
+			dto = new RegisterInfoDTO("Nikolina", "Petkovic", "ninapetkovic@gmail.com", "1234", "060119811", "manager");
+			managerService.registerManager(dto);
 		};
 	}
 }
