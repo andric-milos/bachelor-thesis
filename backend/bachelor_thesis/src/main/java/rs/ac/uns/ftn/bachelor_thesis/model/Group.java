@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.bachelor_thesis.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -18,14 +19,16 @@ public class Group {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    private String name;
+
     @ManyToMany
     @JoinTable(
             name = "group_players",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "player_id")
     )
-    private Set<Player> players;
+    private Set<Player> players = new HashSet<>();
 
     @OneToMany(mappedBy = "group")
-    private Set<Appointment> appointments;
+    private Set<Appointment> appointments = new HashSet<>();
 }
