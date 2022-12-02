@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -10,6 +11,10 @@ function NewGroupModal(props) {
     const [players, setPlayers] = useState([]);
     const [checked, setChecked] = useState([]);
     const [selectedPlayers, setSelectedPlayers] = useState([]);
+
+    const nameInputRef = useRef();
+
+    const navigate = useNavigate();
 
     const handleClose = () => {
         setShow(false);
@@ -44,7 +49,23 @@ function NewGroupModal(props) {
     }
 
     const createGroupHandler = () => {
-        console.log(selectedPlayers);
+        let dto = {
+            "name" : nameInputRef.current.value,
+            "playersEmails" : selectedPlayers
+        };
+
+        // console.log(selectedPlayers);
+        console.log(dto);
+
+        axios.post("http://localhost:8080/group/", dto, {headers: {'Authorization' : 'Bearer ' + localStorage.getItem("accessToken")}})
+            .then(response => {
+                alert("You successfully created a new group!");
+                navigate(0); // Refreshing.
+            })
+            .catch(error => {
+                console.log(error);
+                alert(error.message);
+            });
     }
 
     const initializeCheckedArray = (length) => {
@@ -81,10 +102,15 @@ function NewGroupModal(props) {
                     <Modal.Title>Create a group</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <div className="d-flex d-row m-1">
+                        <label className="p-2"><b>Name:</b></label>
+                        <input type="text" className="p-2 w-100" id="name" ref={nameInputRef}></input>
+                    </div>
+
                     {players.map((player, index) => {
                         return (
                             <div key={`div-${player.id}`} className="d-flex flex-row justify-content-between m-1">
-                                <p key={`p-${player.id}`}><b>{player.email} ({player.firstName} {player.lastName})</b></p>
+                                <p key={`p-${player.id}`} className="px-2"><b>{player.email} ({player.firstName} {player.lastName})</b></p>
                                 <ToggleButton 
                                     key={`tb-${player.id}`}
                                     id={`radio-${index}`}
