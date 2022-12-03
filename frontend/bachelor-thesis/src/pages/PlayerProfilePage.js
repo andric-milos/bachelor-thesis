@@ -1,13 +1,27 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import NewGroupModal from "../components/modals/NewGroupModal";
 import UserInfo from "../components/UserInfo";
 
 function PlayerProfilePage() {
     const [playerData, setPlayerData] = useState({});
+    const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get("http://localhost:8080/player/email/andric8@gmail.com")
+        axios.get("http://localhost:8080/user/whoami", {headers: {'Authorization' : 'Bearer ' + localStorage.getItem("accessToken")}})
+            .then(response => {
+                console.log(response);
+
+                if (!response.data.roles.find(element => element === "ROLE_PLAYER")) {
+                    navigate("/forbidden");
+                }
+            })
+            .catch(error => {
+                navigate("/forbidden");
+            });
+
+        axios.get("http://localhost:8080/player/email/" + localStorage.getItem("subject"))
             .then(response => {
                 console.log(response);
 

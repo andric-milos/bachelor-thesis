@@ -6,6 +6,7 @@ import Homepage from './pages/Homepage';
 import LoginPage from './pages/LoginPage';
 import PlayerProfilePage from './pages/PlayerProfilePage';
 import RegisterPage from './pages/RegisterPage';
+import Forbidden from './pages/Forbidden';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path='/register' element={ <RegisterPage /> } />
         <Route path='/login' element={ <LoginPage /> } />
         <Route path='/profile' element={ <PlayerProfilePage /> } />
+        <Route path='/forbidden' element={ <Forbidden /> } />
       </Routes>
     </div>
   );
