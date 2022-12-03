@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import rs.ac.uns.ftn.bachelor_thesis.dto.LoginInfoDTO;
-import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
-import rs.ac.uns.ftn.bachelor_thesis.dto.TokensDTO;
-import rs.ac.uns.ftn.bachelor_thesis.dto.UserRoleDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.*;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
@@ -120,5 +119,18 @@ public class UserController {
         }
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/whoami")
+    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_MANAGER')")
+    public ResponseEntity<?> whoAmI() {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> user = userService.getUserByEmail(email);
+
+        if (user.isEmpty()) {
+            return new ResponseEntity<>("Not logged in!", FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(new UserDTO(user.get()), HttpStatus.OK);
     }
 }
