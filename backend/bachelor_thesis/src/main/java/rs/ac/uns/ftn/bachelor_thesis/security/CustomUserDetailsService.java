@@ -12,6 +12,7 @@ import rs.ac.uns.ftn.bachelor_thesis.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -21,15 +22,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
+        Optional<User> userOptional = userRepository.findByEmail(email);
 
-        if (user == null) {
+        if (userOptional.isEmpty()) {
             log.error("User not found in the database");
             throw new UsernameNotFoundException("Username with email " + email + " not found");
         } else {
             log.info("User with email {} found in the database.", email);
         }
 
+        User user = userOptional.get();
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         user.getRoles().forEach(role -> {
             authorities.add(new SimpleGrantedAuthority(role.getName()));

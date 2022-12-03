@@ -10,6 +10,8 @@ import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.repository.ManagerRepository;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -36,17 +38,17 @@ public class ManagerService {
         manager.setPassword(passwordEncoder.encode(dto.getPassword()));
         manager.setTelephone(dto.getTelephone());
 
-        Role roleManager = userService.getRoleByName("ROLE_MANAGER");
-        if (roleManager == null) {
+        Optional<Role> roleManager = userService.getRoleByName("ROLE_MANAGER");
+        if (roleManager.isEmpty()) {
             return 1;
         }
 
-        User user = userService.getUserByEmail(dto.getEmail());
-        if (user != null) {
+        Optional<User> user = userService.getUserByEmail(dto.getEmail());
+        if (user.isPresent()) {
             return 2;
         }
 
-        manager.getRoles().add(roleManager);
+        manager.getRoles().add(roleManager.get());
         managerRepository.save(manager);
 
         return 0;

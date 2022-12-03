@@ -45,15 +45,21 @@ public class UserService{
     public void addRoleToUser(String email, String roleName) {
         log.info("Adding role {} to user {}", roleName, email);
 
-        User user = userRepository.findByEmail(email);
-        Role role = roleRepository.findByName(roleName);
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        Optional<Role> roleOptional = roleRepository.findByName(roleName);
 
-        user.getRoles().add(role);
+        if (userOptional.isPresent() && roleOptional.isPresent()) {
+            User user = userOptional.get();
+            user.getRoles().add(roleOptional.get());
 
-        userRepository.save(user); // this line is redundant, if we put @Transactional annotation above the class declaration
+            userRepository.save(user); // this line is redundant, if we put @Transactional annotation above the class declaration
+            log.info("Role {} successfully added to user {}", roleName, email);
+        } else {
+            log.info("Either role {} or user {} not found in the database!", roleName, email);
+        }
     }
 
-    public User getUserByEmail(String email) {
+    public Optional<User> getUserByEmail(String email) {
         log.info("Fetching user {} from the database", email);
         return userRepository.findByEmail(email);
     }
@@ -63,7 +69,7 @@ public class UserService{
         return userRepository.findAll();
     }
 
-    public Role getRoleByName(String roleName) {
+    public Optional<Role> getRoleByName(String roleName) {
         return roleRepository.findByName(roleName);
     }
 
@@ -71,12 +77,12 @@ public class UserService{
         DecodedJWT decodedJWT = tokenUtil.verify(refreshToken);
 
         String email = decodedJWT.getSubject();
-        User user = getUserByEmail(email);
+        Optional<User> user = getUserByEmail(email);
 
         return tokenUtil.generateAccessToken(
-                user.getEmail(),
+                user.get().getEmail(),
                 issuer,
-                user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
+                user.get().getRoles().stream().map(Role::getName).collect(Collectors.toList())
         );
     }
 

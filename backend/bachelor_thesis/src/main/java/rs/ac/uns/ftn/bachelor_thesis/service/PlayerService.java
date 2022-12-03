@@ -51,17 +51,17 @@ public class PlayerService {
         player.setPassword(passwordEncoder.encode(dto.getPassword()));
         player.setTelephone(dto.getTelephone());
 
-        Role rolePlayer = userService.getRoleByName("ROLE_PLAYER");
-        if (rolePlayer == null) {
+        Optional<Role> rolePlayer = userService.getRoleByName("ROLE_PLAYER");
+        if (rolePlayer.isEmpty()) {
             return 1;
         }
 
-        User user = userService.getUserByEmail(dto.getEmail());
-        if (user != null) {
+        Optional<User> user = userService.getUserByEmail(dto.getEmail());
+        if (user.isPresent()) {
             return 2;
         }
 
-        player.getRoles().add(rolePlayer);
+        player.getRoles().add(rolePlayer.get());
         playerRepository.save(player);
 
         return 0;
