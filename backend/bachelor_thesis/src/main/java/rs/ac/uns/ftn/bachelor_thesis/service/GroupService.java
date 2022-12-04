@@ -6,6 +6,8 @@ import rs.ac.uns.ftn.bachelor_thesis.model.Group;
 import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.repository.GroupRepository;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -48,5 +50,18 @@ public class GroupService {
                                             GroupController class. */
 
         return groupRepository.save(group);
+    }
+
+    public Set<Group> getAllGroupsByPlayer(String playerEmail) {
+        List<Group> allGroups = groupRepository.findAll();
+        Set<Group> playersGroups = new HashSet<>();
+
+        allGroups.forEach(group -> {
+            if (group.getPlayers().stream().anyMatch(player -> player.getEmail().equals(playerEmail))) {
+                playersGroups.add(group);
+            }
+        });
+
+        return playersGroups;
     }
 }

@@ -7,14 +7,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import rs.ac.uns.ftn.bachelor_thesis.dto.CreateGroupDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
+import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.security.CustomCorsFilter;
 import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
+import rs.ac.uns.ftn.bachelor_thesis.service.GroupService;
 import rs.ac.uns.ftn.bachelor_thesis.service.ManagerService;
 import rs.ac.uns.ftn.bachelor_thesis.service.PlayerService;
 import rs.ac.uns.ftn.bachelor_thesis.service.UserService;
 import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @SpringBootApplication
 public class BachelorThesisApplication {
@@ -44,7 +52,10 @@ public class BachelorThesisApplication {
 	}
 
 	@Bean
-	CommandLineRunner run(UserService userService, PlayerService playerService, ManagerService managerService) {
+	CommandLineRunner run(UserService userService,
+						  PlayerService playerService,
+						  ManagerService managerService,
+						  GroupService groupService) {
 		return args -> {
 			userService.saveRole(new Role(null, "ROLE_PLAYER"));
 			userService.saveRole(new Role(null, "ROLE_MANAGER"));
@@ -96,6 +107,20 @@ public class BachelorThesisApplication {
 
 			dto = new RegisterInfoDTO("Nikolina", "Petkovic", "ninapetkovic@gmail.com", "1234", "060119811", "manager");
 			managerService.registerManager(dto);
+
+			// Creating a group
+			Optional<Player> MilosAndric = playerService.getPlayerByEmail("andric8@gmail.com");
+			Set<String> playersEmails = new HashSet<>();
+			Collections.addAll(playersEmails, "vpantic@gmail.com", "vukvuk@gmail.com", "petarpopovic@gmail.com");
+			CreateGroupDTO createGroupDTO = new CreateGroupDTO("Fudbal četvrtkom u 20h", playersEmails);
+			groupService.createGroup(createGroupDTO, MilosAndric.get());
+
+			// Creating a group
+			Optional<Player> JohnDoe = playerService.getPlayerByEmail("johndoe@gmail.com");
+			playersEmails = new HashSet<>();
+			Collections.addAll(playersEmails, "andric8@gmail.com", "nikolic@gmail.com", "markovic@gmail.com");
+			createGroupDTO = new CreateGroupDTO("Joga Bonito", playersEmails);
+			groupService.createGroup(createGroupDTO, JohnDoe.get());
 		};
 	}
 }

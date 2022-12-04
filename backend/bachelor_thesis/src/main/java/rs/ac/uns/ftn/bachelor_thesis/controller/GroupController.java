@@ -4,18 +4,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.bachelor_thesis.dto.CreateGroupDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.GroupDTO;
 import rs.ac.uns.ftn.bachelor_thesis.model.Group;
 import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.service.GroupService;
 import rs.ac.uns.ftn.bachelor_thesis.service.PlayerService;
 import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/group")
@@ -51,5 +51,19 @@ public class GroupController {
         }
 
         return new ResponseEntity<>(HttpStatus.OK); // CREATED?
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_PLAYER')")
+    public ResponseEntity<?> getAllMyGroups() {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Set<Group> groups = groupService.getAllGroupsByPlayer(email);
+
+        Set<GroupDTO> dto = new HashSet<>();
+        groups.forEach(group -> {
+            dto.add(new GroupDTO(group));
+        });
+
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 }
