@@ -1,4 +1,4 @@
-import Button from "react-bootstrap/Button";
+import NewAppointmentModal from "../components/modals/NewAppointmentModal";
 
 function GroupPage() {
     return (
@@ -28,7 +28,7 @@ function GroupPage() {
                 <div className="d-flex flex-column col-sm-6">
                     <div className="d-flex flex-row justify-content-between">
                         <h3><b>Appointments</b></h3>
-                        <Button variant="primary">Add new</Button>
+                        <NewAppointmentModal />
                     </div>
 
                     <div className="card my-1">
