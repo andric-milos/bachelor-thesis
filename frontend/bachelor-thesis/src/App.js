@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import PlayerProfilePage from './pages/PlayerProfilePage';
 import RegisterPage from './pages/RegisterPage';
 import Forbidden from './pages/Forbidden';
+import GroupPage from './pages/GroupPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path='/login' element={ <LoginPage /> } />
         <Route path='/profile' element={ <PlayerProfilePage /> } />
         <Route path='/forbidden' element={ <Forbidden /> } />
+        <Route path='/group' element={ <GroupPage /> } />
       </Routes>
     </div>
   );
