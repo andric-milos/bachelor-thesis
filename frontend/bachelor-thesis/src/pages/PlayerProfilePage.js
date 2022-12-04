@@ -1,11 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import Button from "react-bootstrap/Button";
 import { useNavigate } from "react-router-dom";
 import NewGroupModal from "../components/modals/NewGroupModal";
 import UserInfo from "../components/UserInfo";
 
 function PlayerProfilePage() {
     const [playerData, setPlayerData] = useState({});
+    const [groups, setGroups] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -42,6 +44,16 @@ function PlayerProfilePage() {
             .catch(error => {
                 console.log(error);
             });
+
+            axios.get("http://localhost:8080/group", {headers: {'Authorization' : 'Bearer ' + localStorage.getItem("accessToken")}})
+                .then(response => {
+                    console.log(response);
+
+                    setGroups(response.data);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
     }, []);
 
     return (
@@ -68,21 +80,19 @@ function PlayerProfilePage() {
                     <NewGroupModal />
                 </div>
 
-                <div className="card my-2">
-                    <div className="card-body">
-                        Group 1
-                    </div>
-                </div>
-                <div className="card my-2">
-                    <div className="card-body">
-                        Fudbal četvrtkom u 20h
-                    </div>
-                </div>
-                <div className="card my-2">
-                    <div className="card-body">
-                        Fudbal utorkom u 21h
-                    </div>
-                </div>
+                {groups.map((group, index) => {
+                    return (
+                        <div className="card my-2" key={`div-card-${group.id}`}>
+                            <div 
+                                className="card-body d-flex flex-row justify-content-between" 
+                                key={`div-card-body-${group.id}`}
+                            >
+                                <label className="my-2"><b>{group.name}</b></label>
+                                <Button variant="secondary">View group</Button>
+                            </div>
+                        </div>
+                    )
+                })}
             </div>
         </div>
     );
