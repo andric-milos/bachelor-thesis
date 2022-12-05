@@ -13,6 +13,13 @@ function NewAppointmentModal(props) { // Pass group id as a prop.
     const addressInputRef = useRef();
     const priceInputRef = useRef();
 
+    const dateErrorLabelRef = useRef();
+    const timeErrorLabelRef = useRef();
+    const privacyErrorLabelRef = useRef();
+    const capacityErrorLabelRef = useRef();
+    const addressErrorLabelRef = useRef();
+    const priceErrorLabelRef = useRef();
+
     const handleClose = () => {
         setShow(false);
     }
@@ -20,16 +27,73 @@ function NewAppointmentModal(props) { // Pass group id as a prop.
     const handleShow = () => setShow(true);
 
     const createAppointmentHandler = () => {
-        let dto = {
-            "date" : dateInputRef.current.value,
-            "time" : timeInputRef.current.value,
-            "privacy" : privacySelectRef.current.value,
-            "capacity" : capacityInputRef.current.value,
-            "address" : addressInputRef.current.value,
-            "price" : priceInputRef.current.value
-        };
+        if (formValidation()) {
+            const dateAsMillis = Date.parse(dateInputRef.current.value);
+            const hours = timeInputRef.current.value.substring(0, 2);
+            const minutes = timeInputRef.current.value.substring(3, 5);
+            
+            let dto = {
+                "date" : dateAsMillis + hours * 60 * 60 * 1000 + minutes * 60 * 1000,
+                "privacy" : privacySelectRef.current.value,
+                "capacity" : parseInt(capacityInputRef.current.value),
+                "address" : addressInputRef.current.value,
+                "price" : parseFloat(priceInputRef.current.value)
+            };
+    
+            console.log(dto);
+        }
+    }
 
-        console.log(dto);
+    /* If the form has invalid inputs, this function returns false. */
+    const formValidation = () => {
+        let hasErrors = 0;
+
+        if (isNaN(Date.parse(dateInputRef.current.value))) {
+            ++hasErrors;
+            dateErrorLabelRef.current.innerHTML = "Invalid date input!";
+        } else {
+            dateErrorLabelRef.current.innerHTML = "";
+        }
+
+        if (!timeInputRef.current.value.match(/[012]\d:[012345]\d/)) {
+            ++hasErrors;
+            timeErrorLabelRef.current.innerHTML = "Invalid time input!";
+        } else {
+            timeErrorLabelRef.current.innerHTML = "";
+        }
+
+        if (!privacySelectRef.current.value) {
+            ++hasErrors;
+            privacyErrorLabelRef.current.innerHTML = "Invalid privacy input!";
+        } else {
+            privacyErrorLabelRef.current.innerHTML = "";
+        }
+
+        if (isNaN(parseInt(capacityInputRef.current.value))) {
+            ++hasErrors;
+            capacityErrorLabelRef.current.innerHTML = "Invalid capacity input!";
+        } else {
+            capacityErrorLabelRef.current.innerHTML = "";
+        }
+
+        if (!addressInputRef.current.value) {
+            ++hasErrors;
+            addressErrorLabelRef.current.innerHTML = "Invalid address input!";
+        } else {
+            addressErrorLabelRef.current.innerHTML = "";
+        }
+
+        if (isNaN(parseFloat(priceInputRef.current.value))) {
+            ++hasErrors;
+            priceErrorLabelRef.current.innerHTML = "Invalid price input!";
+        } else {
+            priceErrorLabelRef.current.innerHTML = "";
+        }
+
+        if (hasErrors)
+            return false;
+        
+        return true;
     }
 
     return (
@@ -46,10 +110,12 @@ function NewAppointmentModal(props) { // Pass group id as a prop.
                             <div className="d-flex flex-column w-50 m-1">
                                 <label ><b>Date:</b></label>
                                 <input type="date" className="p-2" ref={dateInputRef}></input>
+                                <label className="text-danger" ref={dateErrorLabelRef}></label>
                             </div>
                             <div className="d-flex flex-column w-50 m-1">
                                 <label ><b>Time:</b></label>
                                 <input type="time" className="p-2" ref={timeInputRef}></input>
+                                <label className="text-danger" ref={timeErrorLabelRef}></label>
                             </div>
                         </div>
 
@@ -60,6 +126,7 @@ function NewAppointmentModal(props) { // Pass group id as a prop.
                                     <option value="private">Private</option>
                                     <option value="public">Public</option>
                                 </select>
+                                <label className="text-danger" ref={privacyErrorLabelRef}></label>
                             </div>
                             <div className="d-flex flex-column w-50 m-1">
                                 <label ><b>Capacity:</b></label>
@@ -69,12 +136,14 @@ function NewAppointmentModal(props) { // Pass group id as a prop.
                                     min="2" max="14" 
                                     ref={capacityInputRef}>
                                 </input>
+                                <label className="text-danger" ref={capacityErrorLabelRef}></label>
                             </div>
                         </div>
 
                         <div className="d-flex flex-column m-1">
                             <label ><b>Address:</b></label>
                             <input type="text" className="p-2" ref={addressInputRef}></input>
+                            <label className="text-danger" ref={addressErrorLabelRef}></label>
                         </div>
 
                         <div className="d-flex flex-column m-1">
@@ -85,6 +154,7 @@ function NewAppointmentModal(props) { // Pass group id as a prop.
                                 placeholder="Price in RSD"
                                 ref={priceInputRef}>
                             </input>
+                            <label className="text-danger" ref={priceErrorLabelRef}></label>
                         </div>
                     </div>
                 </Modal.Body>
