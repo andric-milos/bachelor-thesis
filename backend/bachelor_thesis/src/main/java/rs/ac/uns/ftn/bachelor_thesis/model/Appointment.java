@@ -26,7 +26,7 @@ public class Appointment {
     private int occupancy; // Calculated: (set of players).length
     private double price;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id")
     private Location location;
 
@@ -45,4 +45,18 @@ public class Appointment {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
+
+    public Appointment(Group group,
+                       Date date,
+                       AppointmentPrivacy privacy,
+                       Location location,
+                       int capacity,
+                       double price) {
+        this.group = group;
+        this.date = date;
+        this.privacy = privacy;
+        this.location = location;
+        this.capacity = capacity;
+        this.price = price;
+    }
 }

@@ -1,8 +1,11 @@
 package rs.ac.uns.ftn.bachelor_thesis.validation;
 
 import rs.ac.uns.ftn.bachelor_thesis.dto.CreateGroupDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.NewAppointmentDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
+import rs.ac.uns.ftn.bachelor_thesis.enumeration.AppointmentPrivacy;
 
+import java.util.Date;
 import java.util.regex.Pattern;
 
 public class ValidationUtil {
@@ -79,6 +82,43 @@ public class ValidationUtil {
         for (String email : dto.getPlayersEmails()) {
             if (!Pattern.compile(EMAIL_REGEX_PATTERN).matcher(email).matches())
                 return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Whitelisted values for privacy field are "PRIVATE" and "PUBLIC".
+     * Capacity must be: 2 < capacity < 14.
+     * @param dto
+     * @return true, if the received NewAppointmentDTO object is valid; false if it isn't.
+     */
+    public boolean validateNewAppointmentDTO(NewAppointmentDTO dto) {
+        /* This check is maybe redundant, because Java, when mapping fields passed within
+         * Request Body object, automatically checks if they fit the right format? */
+        try {
+            Date date = new Date(dto.getDate());
+        } catch (Exception e) {
+            return false;
+        }
+
+        if (dto.getAddress() == null || dto.getAddress().equals(""))
+            return false;
+
+        try {
+            AppointmentPrivacy.valueOf(dto.getPrivacy().toUpperCase());
+        } catch (Exception e) {
+            return false;
+        }
+
+        /* There is no need to check if the capacity is null, because Java, when passing null instead
+         * of int, automatically maps that null as 0. */
+        if (dto.getCapacity() < 2 || dto.getCapacity() > 14) {
+            return false;
+        }
+
+        if (dto.getPrice() < 0.0) {
+            return false;
         }
 
         return true;

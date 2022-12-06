@@ -64,4 +64,8 @@ public class GroupService {
 
         return playersGroups;
     }
+
+    public Optional<Group> getGroupById(Long id) {
+        return groupRepository.findById(id);
+    }
 }

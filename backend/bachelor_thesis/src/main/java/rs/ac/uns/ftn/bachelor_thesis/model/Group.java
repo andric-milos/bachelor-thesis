@@ -29,6 +29,6 @@ public class Group {
     )
     private Set<Player> players = new HashSet<>();
 
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private Set<Appointment> appointments = new HashSet<>();
 }
