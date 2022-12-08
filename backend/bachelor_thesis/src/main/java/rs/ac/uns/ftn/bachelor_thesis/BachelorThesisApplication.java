@@ -8,21 +8,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import rs.ac.uns.ftn.bachelor_thesis.dto.CreateGroupDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.NewAppointmentDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
-import rs.ac.uns.ftn.bachelor_thesis.model.Player;
-import rs.ac.uns.ftn.bachelor_thesis.model.Role;
+import rs.ac.uns.ftn.bachelor_thesis.model.*;
 import rs.ac.uns.ftn.bachelor_thesis.security.CustomCorsFilter;
 import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
-import rs.ac.uns.ftn.bachelor_thesis.service.GroupService;
-import rs.ac.uns.ftn.bachelor_thesis.service.ManagerService;
-import rs.ac.uns.ftn.bachelor_thesis.service.PlayerService;
-import rs.ac.uns.ftn.bachelor_thesis.service.UserService;
+import rs.ac.uns.ftn.bachelor_thesis.service.*;
 import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @SpringBootApplication
 public class BachelorThesisApplication {
@@ -55,7 +49,8 @@ public class BachelorThesisApplication {
 	CommandLineRunner run(UserService userService,
 						  PlayerService playerService,
 						  ManagerService managerService,
-						  GroupService groupService) {
+						  GroupService groupService,
+						  AppointmentService appointmentService) {
 		return args -> {
 			userService.saveRole(new Role(null, "ROLE_PLAYER"));
 			userService.saveRole(new Role(null, "ROLE_MANAGER"));
@@ -121,6 +116,26 @@ public class BachelorThesisApplication {
 			Collections.addAll(playersEmails, "andric8@gmail.com", "nikolic@gmail.com", "markovic@gmail.com");
 			createGroupDTO = new CreateGroupDTO("Joga Bonito", playersEmails);
 			groupService.createGroup(createGroupDTO, JohnDoe.get());
+
+			// Adding appointments to the group
+			NewAppointmentDTO appointmentDTO = new NewAppointmentDTO();
+			appointmentDTO.setGroupId(2L);
+			appointmentDTO.setDate(1671130800000L);
+			appointmentDTO.setAddress("Hajduk Veljkova 4");
+			appointmentDTO.setPrivacy("private");
+			appointmentDTO.setCapacity(10);
+			appointmentDTO.setPrice(3800.00);
+			appointmentService.createAppointment(appointmentDTO);
+
+			// Adding appointments to the group
+			appointmentDTO = new NewAppointmentDTO();
+			appointmentDTO.setGroupId(1L);
+			appointmentDTO.setDate(1671130800000L);
+			appointmentDTO.setAddress("Šafarikova 10");
+			appointmentDTO.setPrivacy("private");
+			appointmentDTO.setCapacity(10);
+			appointmentDTO.setPrice(3800.00);
+			appointmentService.createAppointment(appointmentDTO);
 		};
 	}
 }

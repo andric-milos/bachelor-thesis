@@ -45,7 +45,7 @@ function PlayerProfilePage() {
                 console.log(error);
             });
 
-            axios.get("http://localhost:8080/group", {headers: {'Authorization' : 'Bearer ' + localStorage.getItem("accessToken")}})
+            axios.get("http://localhost:8080/group/my", {headers: {'Authorization' : 'Bearer ' + localStorage.getItem("accessToken")}})
                 .then(response => {
                     console.log(response);
 
@@ -55,6 +55,11 @@ function PlayerProfilePage() {
                     console.log(error);
                 });
     }, []);
+
+    const navigateToGroupPage = (groupId) => {
+        console.log(groupId);
+        navigate("/group/" + groupId);
+    }
 
     return (
         <div className="d-flex p-2 mt-5 m-2 justify-content-between">
@@ -88,7 +93,7 @@ function PlayerProfilePage() {
                                 key={`div-card-body-${group.id}`}
                             >
                                 <label className="my-2"><b>{group.name}</b></label>
-                                <Button variant="secondary">View group</Button>
+                                <Button variant="secondary" onClick={() => navigateToGroupPage(group.id)}>View group</Button>
                             </div>
                         </div>
                     )

@@ -53,7 +53,7 @@ public class GroupController {
         return new ResponseEntity<>(HttpStatus.OK); // CREATED?
     }
 
-    @GetMapping
+    @GetMapping("/my")
     @PreAuthorize("hasRole('ROLE_PLAYER')")
     public ResponseEntity<?> getAllMyGroups() {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -63,6 +63,23 @@ public class GroupController {
         groups.forEach(group -> {
             dto.add(new GroupDTO(group));
         });
+
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_PLAYER')")
+    public ResponseEntity<?> getGroupById(@PathVariable("id") Long groupId) {
+        Optional<Group> group = groupService.getGroupById(groupId);
+        if (group.isEmpty())
+            return new ResponseEntity<>("Group with the id " + groupId + " doesn't exists!", HttpStatus.NOT_FOUND);
+
+        GroupDTO dto = new GroupDTO(group.get());
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        /* If the logged in player isn't part of the group, he can't access the group information. */
+        if (!dto.getPlayersEmails().contains(email))
+            return new ResponseEntity<>("You're not a member of the group!", HttpStatus.FORBIDDEN);
 
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
