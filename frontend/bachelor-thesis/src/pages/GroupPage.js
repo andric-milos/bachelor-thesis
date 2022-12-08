@@ -86,7 +86,7 @@ function GroupPage() {
                 <div className="d-flex flex-column col-sm-6">
                     <div className="d-flex flex-row justify-content-between">
                         <h3><b>Appointments</b></h3>
-                        <NewAppointmentModal />
+                        <NewAppointmentModal groupId={groupId} />
                     </div>
 
                     {appointments.length != 0 ? appointments.map((appointment, index) => {

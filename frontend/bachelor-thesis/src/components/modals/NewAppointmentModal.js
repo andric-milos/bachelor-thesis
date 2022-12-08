@@ -2,8 +2,12 @@ import { useState, useRef } from "react";
 
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function NewAppointmentModal(props) { // Pass group id as a prop.
+    const navigate = useNavigate();
+
     const [show, setShow] = useState(false);
 
     const dateInputRef = useRef();
@@ -33,6 +37,7 @@ function NewAppointmentModal(props) { // Pass group id as a prop.
             const minutes = timeInputRef.current.value.substring(3, 5);
             
             let dto = {
+                "groupId" : props.groupId,
                 "date" : dateAsMillis + hours * 60 * 60 * 1000 + minutes * 60 * 1000,
                 "privacy" : privacySelectRef.current.value,
                 "capacity" : parseInt(capacityInputRef.current.value),
@@ -40,7 +45,20 @@ function NewAppointmentModal(props) { // Pass group id as a prop.
                 "price" : parseFloat(priceInputRef.current.value)
             };
     
-            console.log(dto);
+            // console.log(dto);
+
+            axios.post("http://localhost:8080/appointment", dto, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") } })
+                .then(response => {
+                    console.log(response);
+
+                    if (response.status == 200) {
+                        alert("You successfully added a new appointment!");
+                        navigate(0);
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                });
         }
     }
 
