@@ -57,7 +57,7 @@ function PlayerProfilePage() {
     }, []);
 
     const navigateToGroupPage = (groupId) => {
-        console.log(groupId);
+        // console.log(groupId);
         navigate("/group/" + groupId);
     }
 

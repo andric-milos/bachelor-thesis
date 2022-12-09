@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import NewAppointmentModal from "../components/modals/NewAppointmentModal";
+import Button from "react-bootstrap/Button";
 
 function GroupPage() {
     const navigate = useNavigate();
@@ -65,6 +66,10 @@ function GroupPage() {
         return date.toLocaleDateString(undefined, options);
     }
 
+    const navigateToAppointmentPage = (appointmentId) => {
+        navigate("/appointment/" + appointmentId);
+    }
+
     return (
         <div className="d-flex flex-column p-2 mt-5 m-2 justify-content-center">
             <h1 align="center"><b>{groupWithPlayers.name}</b></h1>
@@ -83,7 +88,7 @@ function GroupPage() {
                         )
                     }) : <label>There are no players within this group yet.</label>}
                 </div>
-                <div className="d-flex flex-column col-sm-6">
+                <div className="d-flex flex-column col-sm-6 mx-2">
                     <div className="d-flex flex-row justify-content-between">
                         <h3><b>Appointments</b></h3>
                         <NewAppointmentModal groupId={groupId} />
@@ -96,6 +101,7 @@ function GroupPage() {
                                     <label key={`label1-appmnt-${index}`}><b>{formatDate(appointment.date)}</b></label>
                                     <label key={`label2-appmnt-${index}`}><b>Address: {appointment.location.address}</b></label>
                                     <label key={`label3-appmnt-${index}`}><b>Capacity: {appointment.occupancy}/{appointment.capacity}</b></label>
+                                    <Button variant="primary" onClick={() => navigateToAppointmentPage(appointment.id)} className="w-30">View appointment</Button>
                                 </div>
                             </div>
                         )

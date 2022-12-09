@@ -9,6 +9,7 @@ import RegisterPage from './pages/RegisterPage';
 import ForbiddenPage from './pages/ForbiddenPage';
 import GroupPage from './pages/GroupPage';
 import ErrorPage from './pages/ErrorPage';
+import AppointmentPage from './pages/AppointmentPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path='/forbidden' element={ <ForbiddenPage /> } />
         <Route path='/group/:groupId' element={ <GroupPage /> } />
         <Route path='/error' element={ <ErrorPage /> } />
+        <Route path='/appointment/:id' element={ <AppointmentPage /> } />
       </Routes>
     </div>
   );
