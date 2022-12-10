@@ -6,6 +6,7 @@ import rs.ac.uns.ftn.bachelor_thesis.enumeration.AppointmentPrivacy;
 import rs.ac.uns.ftn.bachelor_thesis.model.Appointment;
 import rs.ac.uns.ftn.bachelor_thesis.model.Group;
 import rs.ac.uns.ftn.bachelor_thesis.model.Location;
+import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.repository.AppointmentRepository;
 
 import java.util.Date;
@@ -42,5 +43,29 @@ public class AppointmentService {
 
     public Optional<Appointment> getAppointmentById(Long id) {
         return appointmentRepository.findById(id);
+    }
+
+    public Appointment addPlayerToAppointment(Appointment appointment, Player player) {
+        try {
+            if (appointment.getPlayers().add(player)) {
+                appointment.setOccupancy(appointment.getOccupancy() + 1);
+                return appointmentRepository.save(appointment);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return appointment;
+    }
+    
+    public boolean removePlayerFromAppointment(Appointment appointment, Player player) {
+        if (appointment.getPlayers().remove(player)) {
+            appointment.setOccupancy(appointment.getOccupancy() - 1);
+            appointmentRepository.save(appointment);
+            return true;
+        }
+
+        return false;
     }
 }

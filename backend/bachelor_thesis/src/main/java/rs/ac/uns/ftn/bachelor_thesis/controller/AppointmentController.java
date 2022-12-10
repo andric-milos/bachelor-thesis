@@ -98,4 +98,46 @@ public class AppointmentController {
 
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
+
+    @PutMapping("/attend/{id}")
+    @PreAuthorize("hasRole('ROLE_PLAYER')")
+    public ResponseEntity<?> attendAppointment(@PathVariable("id") Long appointmentId) {
+        Optional<Appointment> appointment = appointmentService.getAppointmentById(appointmentId);
+
+        if (appointment.isEmpty())
+            return new ResponseEntity<>("Appointment with id " + appointmentId + " not found!", HttpStatus.NOT_FOUND);
+
+        /* Checking if the player can attend this appointment. */
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (appointment.get().getPrivacy().equals(AppointmentPrivacy.PRIVATE)
+                && !groupService.getPlayersEmails(appointment.get().getGroup()).contains(email))
+            return new ResponseEntity<>("You're not a member of the group!", HttpStatus.FORBIDDEN);
+
+        if (appointment.get().getOccupancy() >= appointment.get().getCapacity())
+            return new ResponseEntity<>("Full capacity!", HttpStatus.BAD_REQUEST);
+
+        Optional<Player> player = playerService.getPlayerByEmail(email);
+
+        Appointment updatedAppointment = appointmentService.addPlayerToAppointment(appointment.get(), player.get());
+        if (updatedAppointment == null)
+            return new ResponseEntity<>("Something went wrong on the server!", HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return new ResponseEntity<>(new AppointmentDTO(updatedAppointment), HttpStatus.OK);
+    }
+
+    @PutMapping("/cancel/{id}")
+    @PreAuthorize("hasRole('ROLE_PLAYER')")
+    public ResponseEntity<?> cancelAppointment(@PathVariable("id") Long appointmentId) {
+        Optional<Appointment> appointment = appointmentService.getAppointmentById(appointmentId);
+
+        if (appointment.isEmpty())
+            return new ResponseEntity<>("Appointment with id " + appointmentId + " not found!", HttpStatus.NOT_FOUND);
+
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Player> player = playerService.getPlayerByEmail(email);
+        if (appointmentService.removePlayerFromAppointment(appointment.get(), player.get()))
+            return new ResponseEntity<>("You successfully canceled the appointment!", HttpStatus.OK);
+
+        return new ResponseEntity<>("You were not attending this appointment!", HttpStatus.BAD_REQUEST);
+    }
 }
