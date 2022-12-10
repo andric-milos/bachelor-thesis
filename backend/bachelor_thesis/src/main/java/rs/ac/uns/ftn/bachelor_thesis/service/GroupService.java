@@ -68,4 +68,14 @@ public class GroupService {
     public Optional<Group> getGroupById(Long id) {
         return groupRepository.findById(id);
     }
+
+    public Set<String> getPlayersEmails(Group group) {
+        Set<String> playersEmails = new HashSet<>();
+
+        group.getPlayers().forEach(player -> {
+            playersEmails.add(player.getEmail());
+        });
+
+        return playersEmails;
+    }
 }

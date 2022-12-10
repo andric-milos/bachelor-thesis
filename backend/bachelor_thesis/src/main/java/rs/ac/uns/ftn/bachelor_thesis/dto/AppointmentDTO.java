@@ -3,7 +3,13 @@ package rs.ac.uns.ftn.bachelor_thesis.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rs.ac.uns.ftn.bachelor_thesis.enumeration.TeamColor;
 import rs.ac.uns.ftn.bachelor_thesis.model.Appointment;
+import rs.ac.uns.ftn.bachelor_thesis.model.Game;
+import rs.ac.uns.ftn.bachelor_thesis.model.Goal;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,6 +23,9 @@ public class AppointmentDTO {
     private double price;
     private LocationDTO location;
     private Long groupId;
+    private String groupName;
+    private List<String> playersEmails = new ArrayList<>();
+    private List<GameBasicInfoDTO> games = new ArrayList<>();
 
     public AppointmentDTO(Appointment appointment) {
         this.id = appointment.getId();
@@ -25,12 +34,32 @@ public class AppointmentDTO {
         this.capacity = appointment.getCapacity();
         this.occupancy = appointment.getOccupancy();
         this.price = appointment.getPrice();
+
         this.location = new LocationDTO(
                 appointment.getLocation().getId(),
                 appointment.getLocation().getAddress(),
                 appointment.getLocation().getLongitude(),
                 appointment.getLocation().getLatitude()
         );
+
         this.groupId = appointment.getGroup().getId();
+        this.groupName = appointment.getGroup().getName();
+
+        appointment.getPlayers().forEach(player -> {
+            this.playersEmails.add(player.getEmail());
+        });
+
+        int goalsByTeamRed = 0;
+        int goalsByTeamBlue = 0;
+        for (Game game : appointment.getGames()) {
+            for (Goal goal : game.getGoals()) {
+                if (goal.getTeamColor().equals(TeamColor.BLUE))
+                    ++goalsByTeamBlue;
+                else if (goal.getTeamColor().equals(TeamColor.RED))
+                    ++goalsByTeamRed;
+            }
+
+            this.games.add(new GameBasicInfoDTO(game.getId(), goalsByTeamRed, goalsByTeamBlue));
+        }
     }
 }

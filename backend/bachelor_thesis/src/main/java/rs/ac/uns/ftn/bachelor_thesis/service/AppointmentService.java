@@ -39,4 +39,8 @@ public class AppointmentService {
 
         return null;
     }
+
+    public Optional<Appointment> getAppointmentById(Long id) {
+        return appointmentRepository.findById(id);
+    }
 }

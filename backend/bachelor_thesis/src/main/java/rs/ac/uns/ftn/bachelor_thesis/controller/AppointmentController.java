@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.bachelor_thesis.dto.AppointmentDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.NewAppointmentDTO;
+import rs.ac.uns.ftn.bachelor_thesis.enumeration.AppointmentPrivacy;
 import rs.ac.uns.ftn.bachelor_thesis.model.Appointment;
 import rs.ac.uns.ftn.bachelor_thesis.model.Group;
 import rs.ac.uns.ftn.bachelor_thesis.model.Player;
@@ -77,5 +78,24 @@ public class AppointmentController {
         });
 
         return new ResponseEntity<>(appointmentSet, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_PLAYER')")
+    public ResponseEntity<?> getAppointmentById(@PathVariable("id") Long appointmentId) {
+        Optional<Appointment> appointment = appointmentService.getAppointmentById(appointmentId);
+
+        if (appointment.isEmpty())
+            return new ResponseEntity<>("Appointment with id " + appointmentId + " not found!", HttpStatus.NOT_FOUND);
+
+        /* Checking if the player has access to this data. */
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (appointment.get().getPrivacy().equals(AppointmentPrivacy.PRIVATE)
+                && !groupService.getPlayersEmails(appointment.get().getGroup()).contains(email))
+            return new ResponseEntity<>("You're not a member of the group!", HttpStatus.FORBIDDEN);
+
+        AppointmentDTO dto = new AppointmentDTO(appointment.get());
+
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 }
