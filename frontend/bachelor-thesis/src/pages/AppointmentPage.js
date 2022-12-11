@@ -1,4 +1,39 @@
+import { useState } from "react";
+
 function AppointmentPage() {
+    const [appointmentState, setAppointmentState] = useState({
+        capacity: 10,
+        date: 1671130800000,
+        games: [],
+        groupId: 2,
+        groupName: "Joga Bonito",
+        id: 1,
+        location: {
+            id: 1,
+            address: "Hajduk Veljkova 4",
+            longitude: 0,
+            latitude: 0
+        },
+        occupancy: 7,
+        playersEmails: ["a@gmail.com", "b@gmail.com", "c@gmail.com", "d@gmail.com", "e@gmail.com", "f@gmail.com", "g@gmail.com"],
+        price: 3800,
+        privacy: "private"
+    });
+
+    const formatDate = (milliseconds) => {
+        const options = {
+            weekday: "long", 
+            year: "numeric", 
+            month: "long", 
+            day: "2-digit", 
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        };
+        let date = new Date(milliseconds);
+        return date.toLocaleDateString(undefined, options);
+    }
+
     return (
         <div className="d-flex flex-column p-2 mt-5 m-2 justify-content-center">
             <div className="d-flex flex-row mt-4">
@@ -8,44 +43,28 @@ function AppointmentPage() {
                 <div className="d-flex flex-column col-sm-6 mx-3">
                     <h1><b>Group name</b></h1>
                     <div className="px-2 d-flex flex-column">
-                        <label><b>Date: 03.11.2022. 20:00</b></label>
-                        <label><b>Address: Hajduk Veljkova 4</b></label>
-                        <label><b>Occupancy: 8/12</b></label>
-                        <label><b>Privacy: public</b></label>
-                        <label><b>Price: 3800 RSD</b></label>
+                        <label><b>{formatDate(appointmentState.date)}</b></label>
+                        <label><b>Address: {appointmentState.location.address}</b></label>
+                        <label><b>Occupancy: {appointmentState.occupancy}/{appointmentState.capacity}</b></label>
+                        <label><b>Privacy: {appointmentState.privacy}</b></label>
+                        <label><b>Price: {appointmentState.price} RSD</b></label>
                     </div>
                 </div>
             </div>
 
             <div className="d-flex flex-row mt-4">
                 <div className="d-flex flex-column col-sm-6">
-                    <h3><b>Attending players [8/12]</b></h3>
+                    <h3><b>Attending players [{appointmentState.occupancy}/{appointmentState.capacity}]</b></h3>
 
-                    <div className="card my-1">
-                        <div className="card-body">
-                            <label><b>asfjasf@gmail.com</b></label>
-                        </div>
-                    </div>
-                    <div className="card my-1">
-                        <div className="card-body">
-                            <label><b>asfjasf@gmail.com</b></label>
-                        </div>
-                    </div>
-                    <div className="card my-1">
-                        <div className="card-body">
-                            <label><b>asfjasf@gmail.com</b></label>
-                        </div>
-                    </div>
-                    <div className="card my-1">
-                        <div className="card-body">
-                            <label><b>asfjasf@gmail.com</b></label>
-                        </div>
-                    </div>
-                    <div className="card my-1">
-                        <div className="card-body">
-                            <label><b>asfjasf@gmail.com</b></label>
-                        </div>
-                    </div>
+                    {appointmentState.playersEmails.length != 0 ? appointmentState.playersEmails.map((email, index) => {
+                        return (
+                            <div className="card my-1" key={`div-card-player-${index}`}>
+                                <div className="card-body" key={`div-cardBody-player-${index}`}>
+                                    <label key={`label-player-${index}`}><b>{email}</b></label>
+                                </div>
+                            </div>
+                        )
+                    }) : <label>There are no attendees.</label>}
                 </div>
 
                 <div className="d-flex flex-column col-sm-6 mx-3">

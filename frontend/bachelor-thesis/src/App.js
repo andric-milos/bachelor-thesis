@@ -23,7 +23,7 @@ function App() {
         <Route path='/forbidden' element={ <ForbiddenPage /> } />
         <Route path='/group/:groupId' element={ <GroupPage /> } />
         <Route path='/error' element={ <ErrorPage /> } />
-        <Route path='/appointment/:id' element={ <AppointmentPage /> } />
+        <Route path='/appointment/:appointmentId' element={ <AppointmentPage /> } />
       </Routes>
     </div>
   );
