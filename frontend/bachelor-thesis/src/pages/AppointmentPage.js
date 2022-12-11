@@ -1,4 +1,5 @@
 import { useState } from "react";
+import NewGameModal from "../components/modals/NewGameModal";
 
 function AppointmentPage() {
     const [appointmentState, setAppointmentState] = useState({
@@ -70,7 +71,7 @@ function AppointmentPage() {
                 <div className="d-flex flex-column col-sm-6 mx-3">
                     <div className="d-flex flex-row justify-content-between">
                         <h3><b>Games</b></h3>
-                        <button className="btn btn-primary">Add new</button>
+                        <NewGameModal players={appointmentState.playersEmails} />
                     </div>
 
                     <div className="card my-1">

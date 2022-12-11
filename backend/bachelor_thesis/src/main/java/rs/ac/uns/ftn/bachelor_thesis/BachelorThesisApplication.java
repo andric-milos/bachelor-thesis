@@ -106,7 +106,7 @@ public class BachelorThesisApplication {
 			// Creating a group
 			Optional<Player> MilosAndric = playerService.getPlayerByEmail("andric8@gmail.com");
 			Set<String> playersEmails = new HashSet<>();
-			Collections.addAll(playersEmails, "vpantic@gmail.com", "vukvuk@gmail.com", "petarpopovic@gmail.com");
+			Collections.addAll(playersEmails, "vpantic@gmail.com", "vukvuk@gmail.com", "petarpopovic@gmail.com", "travolta@gmail.com", "scholes@gmail.com", "benzema@gmail.com", "jvukotic@gmail.com");
 			CreateGroupDTO createGroupDTO = new CreateGroupDTO("Fudbal četvrtkom u 20h", playersEmails);
 			groupService.createGroup(createGroupDTO, MilosAndric.get());
 
