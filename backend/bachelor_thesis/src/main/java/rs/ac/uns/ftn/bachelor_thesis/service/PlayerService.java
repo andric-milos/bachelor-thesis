@@ -66,4 +66,19 @@ public class PlayerService {
 
         return 0;
     }
+
+    /**
+     * Receives a list of players' emails and checks if the players actually exist in the database.
+     * @param playersEmails
+     * @return true, if the players exist, false if one or more players don't exist in the database.
+     */
+    public boolean doPlayersExist(List<String> playersEmails) {
+        for (String email : playersEmails) {
+            Optional<Player> player = getPlayerByEmail(email);
+            if (player.isEmpty())
+                return false;
+        }
+
+        return true;
+    }
 }

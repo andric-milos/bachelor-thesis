@@ -1,12 +1,12 @@
 package rs.ac.uns.ftn.bachelor_thesis.validation;
 
-import rs.ac.uns.ftn.bachelor_thesis.dto.CreateGroupDTO;
-import rs.ac.uns.ftn.bachelor_thesis.dto.NewAppointmentDTO;
-import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.*;
 import rs.ac.uns.ftn.bachelor_thesis.enumeration.AppointmentPrivacy;
+import rs.ac.uns.ftn.bachelor_thesis.enumeration.TeamColor;
 
 import java.util.Date;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class ValidationUtil {
     /*
@@ -119,6 +119,47 @@ public class ValidationUtil {
 
         if (dto.getPrice() < 0.0) {
             return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks whether the received CreateGameDTO object is valid - teams must not be empty,
+     * player can't be in both teams, emails must match the pattern, team color value must be valid.
+     * Whitelisted values for goal->teamColor are: "RED" and "BLUE";
+     * @param dto
+     * @return true, if the received object is valid, false if it is not.
+     */
+    public boolean validateCreateGameDTO(CreateGameDTO dto) {
+        if (dto.getAppointmentId() == null)
+            return false;
+
+        if (dto.getTeamRed().isEmpty() || dto.getTeamBlue().isEmpty())
+            return false;
+
+        if (Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).distinct().count() <
+            Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).count())
+            return false;
+
+        for (String email : Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).toList()) {
+            if (!Pattern.compile(EMAIL_REGEX_PATTERN).matcher(email).matches())
+                return false;
+        }
+
+        for (GoalDTO goal : dto.getGoals()) {
+            try {
+                if (TeamColor.valueOf(goal.getTeamColor().toUpperCase()).equals(TeamColor.RED)
+                        && !dto.getTeamRed().contains(goal.getPlayer())) {
+                    return false;
+                } else if (TeamColor.valueOf(goal.getTeamColor().toUpperCase()).equals(TeamColor.BLUE)
+                        && !dto.getTeamBlue().contains(goal.getPlayer())) {
+                    return false;
+                }
+            } catch (Exception e) { // IllegalArgumentException thrown by Enum.valueOf method.
+                return false;
+            }
+
         }
 
         return true;

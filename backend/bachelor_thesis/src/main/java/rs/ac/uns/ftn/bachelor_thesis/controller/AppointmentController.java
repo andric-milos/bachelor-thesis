@@ -6,9 +6,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.bachelor_thesis.dto.AppointmentDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.CreateGameDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.GameBasicInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.NewAppointmentDTO;
 import rs.ac.uns.ftn.bachelor_thesis.enumeration.AppointmentPrivacy;
 import rs.ac.uns.ftn.bachelor_thesis.model.Appointment;
+import rs.ac.uns.ftn.bachelor_thesis.model.Game;
 import rs.ac.uns.ftn.bachelor_thesis.model.Group;
 import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.service.AppointmentService;
@@ -19,6 +22,7 @@ import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/appointment")
@@ -139,5 +143,29 @@ public class AppointmentController {
             return new ResponseEntity<>("You successfully canceled the appointment!", HttpStatus.OK);
 
         return new ResponseEntity<>("You were not attending this appointment!", HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/game")
+    @PreAuthorize("hasRole('ROLE_PLAYER')")
+    public ResponseEntity<?> addGame(@RequestBody CreateGameDTO dto) {
+        if (!validationUtil.validateCreateGameDTO(dto))
+            return new ResponseEntity<>("Invalid input of data!", HttpStatus.BAD_REQUEST);
+
+        Optional<Appointment> appointment = appointmentService.getAppointmentById(dto.getAppointmentId());
+        if (appointment.isEmpty())
+            return new ResponseEntity<>("Appointment with id " + dto.getAppointmentId() + " not found!", HttpStatus.NOT_FOUND);
+
+        if (!playerService.doPlayersExist(Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).toList()))
+            return new ResponseEntity<>("You entered one or more non-existing players!", HttpStatus.BAD_REQUEST);
+
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Player> player = playerService.getPlayerByEmail(email);
+
+        if (!appointment.get().getPlayers().contains(player.get()))
+            return new ResponseEntity<>("You are not an attendee of this appointment!", HttpStatus.FORBIDDEN);
+
+        Game game = appointmentService.addGame(dto);
+
+        return new ResponseEntity<>(new GameBasicInfoDTO(game), HttpStatus.OK);
     }
 }

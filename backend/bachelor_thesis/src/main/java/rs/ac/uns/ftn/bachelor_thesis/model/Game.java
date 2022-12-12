@@ -22,14 +22,14 @@ public class Game {
     @JoinColumn(name = "appointment_id") // Maybe add a nullable=false?
     private Appointment appointment;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "teamRed_id") // Maybe add a nullable=false?
     private Team teamRed;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "teamBlue_id") // Maybe add a nullable=false?
     private Team teamBlue;
 
-    @OneToMany(mappedBy = "game")
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
     private List<Goal> goals;
 }

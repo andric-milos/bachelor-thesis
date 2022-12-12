@@ -49,9 +49,11 @@ public class AppointmentDTO {
             this.playersEmails.add(player.getEmail());
         });
 
-        int goalsByTeamRed = 0;
-        int goalsByTeamBlue = 0;
+        int goalsByTeamRed, goalsByTeamBlue;
         for (Game game : appointment.getGames()) {
+            goalsByTeamRed = 0;
+            goalsByTeamBlue = 0;
+
             for (Goal goal : game.getGoals()) {
                 if (goal.getTeamColor().equals(TeamColor.BLUE))
                     ++goalsByTeamBlue;

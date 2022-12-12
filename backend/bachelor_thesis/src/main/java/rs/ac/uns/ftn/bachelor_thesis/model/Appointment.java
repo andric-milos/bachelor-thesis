@@ -5,6 +5,7 @@ import rs.ac.uns.ftn.bachelor_thesis.enumeration.AppointmentPrivacy;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -39,8 +40,8 @@ public class Appointment {
     private Set<Player> players; // Maybe, put List instead of a Set, because List has an order structure.
     // Set/list of players who applied for the appointment
 
-    @OneToMany(mappedBy = "appointment")
-    private Set<Game> games;
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL)
+    private List<Game> games;
 
     @ManyToOne
     @JoinColumn(name = "group_id")
