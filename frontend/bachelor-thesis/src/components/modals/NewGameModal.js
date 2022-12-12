@@ -3,6 +3,8 @@ import Button from "react-bootstrap/Button";
 import { useState } from "react";
 import AddTeamModal from "./AddTeamModal";
 import AddGoalModal from "./AddGoalModal";
+import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
 
 function NewGameModal({ players }) {
     const [show, setShow] = useState(false);
@@ -16,21 +18,44 @@ function NewGameModal({ players }) {
     const addTeamRed = (players) => setTeamRed(players);
     const addTeamBlue = (players) => setTeamBlue(players);
 
+    let { appointmentId } = useParams();
+    const navigate = useNavigate();
+
     const addGoal = (goal) => {
         let tmp = goals.slice();
         tmp.push(goal);
         setGoals(tmp);
     }
 
-    const outputToConsole = () => {
-        console.log("Team Red:" + teamRed);
-        console.log("Team Blue:" + teamBlue);
+    const submitHandler = () => {
+        const dto = {
+            "appointmentId": appointmentId,
+            "teamRed": teamRed,
+            "teamBlue": teamBlue,
+            "goals": goals
+        };
 
-        console.log("Goals: ");
-        for (let i = 0; i < goals.length; i++) {
-            console.log(goals[i].player + " " + goals[i].teamColor);
-        }
-        
+        axios.post("http://localhost:8080/appointment/game", dto, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") } })
+            .then(response => {
+                if (response.status == 200) {
+                    alert("You succesfully added a new game");
+                    navigate(0);
+                }
+            })
+            .catch(error => {
+                try {
+                    if (error.response.status == 403) {
+                        navigate("/forbidden");
+                    } else if (error.response.status == 404) {
+                        navigate("/error");
+                    } else if (error.response.status == 400) {
+                        alert(error.response.data);
+                    }
+                } catch (exception) {
+                    console.log(exception);
+                    navigate("/forbidden");
+                }
+            });
     }
 
     return (
@@ -74,7 +99,7 @@ function NewGameModal({ players }) {
                         <label><b>Goals</b></label>
                         <AddGoalModal teamRedPlayers={teamRed} teamBluePlayers={teamBlue} addGoal={addGoal} />
                     </div>
-                    
+
                     <div className="card my-1">
                         {goals.length != 0 ? goals.map((goal, index) => {
                             return (
@@ -87,7 +112,7 @@ function NewGameModal({ players }) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>Close</Button>
-                    <Button variant="primary" onClick={outputToConsole}>Submit</Button>
+                    <Button variant="primary" onClick={submitHandler}>Submit</Button>
                 </Modal.Footer>
             </Modal>
         </div>
