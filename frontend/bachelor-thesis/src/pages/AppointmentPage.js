@@ -1,4 +1,6 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import NewGameModal from "../components/modals/NewGameModal";
 
 function AppointmentPage() {
@@ -20,6 +22,29 @@ function AppointmentPage() {
         price: 3800,
         privacy: "private"
     });
+
+    const navigate = useNavigate();
+    let { appointmentId } = useParams();
+
+    useEffect(() => {
+        axios.get("http://localhost:8080/appointment/" + appointmentId, {headers: {'Authorization' : 'Bearer ' + localStorage.getItem("accessToken")}})
+            .then(response => {
+                console.log(response.data);
+                setAppointmentState(response.data);
+            })
+            .catch(error => {
+                try {
+                    if (error.response.status == 403) {
+                        navigate("/forbidden");
+                    } else if (error.response.status == 404) {
+                        navigate("/error");
+                    }
+                } catch (exception) {
+                    console.log(exception);
+                    navigate("/forbidden");
+                }
+            });
+    }, []);
 
     const formatDate = (milliseconds) => {
         const options = {
