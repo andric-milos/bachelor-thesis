@@ -9,7 +9,7 @@ function AppointmentPage() {
         date: 1671130800000,
         games: [],
         groupId: 2,
-        groupName: "Joga Bonito",
+        groupName: "Group name",
         id: 1,
         location: {
             id: 1,
@@ -27,7 +27,7 @@ function AppointmentPage() {
     let { appointmentId } = useParams();
 
     useEffect(() => {
-        axios.get("http://localhost:8080/appointment/" + appointmentId, {headers: {'Authorization' : 'Bearer ' + localStorage.getItem("accessToken")}})
+        axios.get("http://localhost:8080/appointment/" + appointmentId, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") } })
             .then(response => {
                 console.log(response.data);
                 setAppointmentState(response.data);
@@ -48,10 +48,10 @@ function AppointmentPage() {
 
     const formatDate = (milliseconds) => {
         const options = {
-            weekday: "long", 
-            year: "numeric", 
-            month: "long", 
-            day: "2-digit", 
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "2-digit",
             hour: "2-digit",
             minute: "2-digit",
             second: "2-digit"
@@ -67,7 +67,7 @@ function AppointmentPage() {
                     <img src="https://joomly.net/frontend/web/images/googlemap/map.png" alt="map icon" />
                 </div>
                 <div className="d-flex flex-column col-sm-6 mx-3">
-                    <h1><b>Group name</b></h1>
+                    <h1><b>{appointmentState.groupName}</b></h1>
                     <div className="px-2 d-flex flex-column">
                         <label><b>{formatDate(appointmentState.date)}</b></label>
                         <label><b>Address: {appointmentState.location.address}</b></label>
@@ -99,11 +99,17 @@ function AppointmentPage() {
                         <NewGameModal players={appointmentState.playersEmails} />
                     </div>
 
-                    <div className="card my-1">
-                        <div className="card-body d-flex flex-column">
-                            <label className="h1" align="center"><b>Team Red 3 - 2 Team Blue</b></label>
-                        </div>
-                    </div>
+                    {appointmentState.games.length != 0 ? appointmentState.games.map(game => {
+                        return (
+                            <div className="card my-1" key={`div-card-game-${game.id}`}>
+                                <div className="card-body d-flex flex-column" key={`div-cardBody-player-${game.id}`}>
+                                    <label className="h1" align="center" key={`label-game-${game.id}`}>
+                                        <b>Team Red {game.goalsTeamRed} - {game.goalsTeamBlue} Team Blue</b>
+                                    </label>
+                                </div>
+                            </div>
+                        )
+                    }) : <label>There are no games added.</label>}
                 </div>
             </div>
         </div>
