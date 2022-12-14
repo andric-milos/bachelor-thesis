@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import Button from "react-bootstrap/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import NewGameModal from "../components/modals/NewGameModal";
 
@@ -22,6 +23,7 @@ function AppointmentPage() {
         price: 3800,
         privacy: "private"
     });
+    const [attendingState, setAttendingState] = useState(false);
 
     const navigate = useNavigate();
     let { appointmentId } = useParams();
@@ -37,6 +39,27 @@ function AppointmentPage() {
                     if (error.response.status == 403) {
                         navigate("/forbidden");
                     } else if (error.response.status == 404) {
+                        navigate("/error");
+                    }
+                } catch (exception) {
+                    console.log(exception);
+                    navigate("/forbidden");
+                }
+            });
+
+        axios.get("http://localhost:8080/appointment/amIattending/" + appointmentId, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") } })
+            .then(response => {
+                console.log(response);
+
+                if (response.status == 200) {
+                    setAttendingState(response.data);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+
+                try {
+                    if (error.response.status == 404) {
                         navigate("/error");
                     }
                 } catch (exception) {
@@ -60,6 +83,62 @@ function AppointmentPage() {
         return date.toLocaleDateString(undefined, options);
     }
 
+    const onClickAttendHandler = () => {
+        axios.put("http://localhost:8080/appointment/attend/" + appointmentId, {}, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") } })
+            .then(response => {
+                if (response.status == 200) {
+                    alert("You successfully applied to attend the appointment!");
+                    navigate(0);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+
+                try {
+                    if (error.response.status == 403) {
+                        navigate("/forbidden");
+                    } else if (error.response.status == 404) {
+                        navigate("/error");
+                    } else if (error.response.status == 400) {
+                        alert(error.response.data);
+                    } else if (error.response.status == 500) {
+                        alert(error.response.data);
+                    }
+                } catch (exception) {
+                    console.log(exception);
+                    navigate("/forbidden");
+                }
+            });
+    }
+
+    const onClickCancelHandler = () => {
+        axios.put("http://localhost:8080/appointment/cancel/" + appointmentId, {}, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") } })
+            .then(response => {
+                if (response.status == 200) {
+                    alert("You successfully canceled the appointment!");
+                    navigate(0);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+
+                try {
+                    if (error.response.status == 403) {
+                        navigate("/forbidden");
+                    } else if (error.response.status == 404) {
+                        navigate("/error");
+                    } else if (error.response.status == 400) {
+                        alert(error.response.data);
+                    } else if (error.response.status == 500) {
+                        alert(error.response.data);
+                    }
+                } catch (exception) {
+                    console.log(exception);
+                    navigate("/forbidden");
+                }
+            });
+    }
+
     return (
         <div className="d-flex flex-column p-2 mt-5 m-2 justify-content-center">
             <div className="d-flex flex-row mt-4">
@@ -80,7 +159,13 @@ function AppointmentPage() {
 
             <div className="d-flex flex-row mt-4">
                 <div className="d-flex flex-column col-sm-6">
-                    <h3><b>Attending players [{appointmentState.occupancy}/{appointmentState.capacity}]</b></h3>
+                    <div className="d-flex flex-row justify-content-between">
+                        <h3><b>Attending players [{appointmentState.occupancy}/{appointmentState.capacity}]</b></h3>
+                        {!attendingState ? 
+                            <Button variant="primary" onClick={onClickAttendHandler}>Attend</Button> :
+                            <Button variant="secondary" onClick={onClickCancelHandler}>Cancel</Button>
+                        }
+                    </div>
 
                     {appointmentState.playersEmails.length != 0 ? appointmentState.playersEmails.map((email, index) => {
                         return (

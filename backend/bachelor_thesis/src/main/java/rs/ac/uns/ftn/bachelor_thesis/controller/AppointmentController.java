@@ -168,4 +168,21 @@ public class AppointmentController {
 
         return new ResponseEntity<>(new GameBasicInfoDTO(game), HttpStatus.OK);
     }
+
+    @GetMapping("/amIattending/{id}")
+    @PreAuthorize("hasRole('ROLE_PLAYER')")
+    public ResponseEntity<?> amIattending(@PathVariable("id") Long appointmentId) {
+        Optional<Appointment> appointment = appointmentService.getAppointmentById(appointmentId);
+
+        if (appointment.isEmpty())
+            return new ResponseEntity<>("Appointment with id " + appointmentId + " not found!", HttpStatus.NOT_FOUND);
+
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        for (Player player : appointment.get().getPlayers()) {
+            if (player.getEmail().equals(email))
+                return new ResponseEntity<>(true, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(false, HttpStatus.OK);
+    }
 }
