@@ -136,6 +136,46 @@ public class BachelorThesisApplication {
 			appointmentDTO.setCapacity(10);
 			appointmentDTO.setPrice(3800.00);
 			appointmentService.createAppointment(appointmentDTO);
+
+			// Adding appointments to the group
+			appointmentDTO = new NewAppointmentDTO();
+			appointmentDTO.setGroupId(2L);
+			appointmentDTO.setDate(1670698800000L);
+			appointmentDTO.setAddress("Bulevara Cara Lazara 83");
+			appointmentDTO.setPrivacy("public");
+			appointmentDTO.setCapacity(12);
+			appointmentDTO.setPrice(4000.00);
+			appointmentService.createAppointment(appointmentDTO);
+
+			// Adding appointments to the group
+			appointmentDTO = new NewAppointmentDTO();
+			appointmentDTO.setGroupId(1L);
+			appointmentDTO.setDate(1671735600000L);
+			appointmentDTO.setAddress("Braće Ribnikar 7");
+			appointmentDTO.setPrivacy("public");
+			appointmentDTO.setCapacity(12);
+			appointmentDTO.setPrice(3000.00);
+			appointmentService.createAppointment(appointmentDTO);
+
+			// Adding appointments to the group
+			appointmentDTO = new NewAppointmentDTO();
+			appointmentDTO.setGroupId(1L);
+			appointmentDTO.setDate(1672340400000L);
+			appointmentDTO.setAddress("Mičurinova 12");
+			appointmentDTO.setPrivacy("public");
+			appointmentDTO.setCapacity(12);
+			appointmentDTO.setPrice(3400.00);
+			appointmentService.createAppointment(appointmentDTO);
+
+			// Adding appointments to the group
+			appointmentDTO = new NewAppointmentDTO();
+			appointmentDTO.setGroupId(2L);
+			appointmentDTO.setDate(1672340400000L);
+			appointmentDTO.setAddress("Bulevar Evrope 78");
+			appointmentDTO.setPrivacy("public");
+			appointmentDTO.setCapacity(12);
+			appointmentDTO.setPrice(3400.00);
+			appointmentService.createAppointment(appointmentDTO);
 		};
 	}
 }

@@ -117,4 +117,16 @@ public class AppointmentService {
 
         return gameRepository.save(game);
     }
+
+    public List<Appointment> getAllPublicAppointments() {
+        List<Appointment> appointments = appointmentRepository.findAll();
+        List<Appointment> publicAppointments = new ArrayList<>();
+
+        appointments.forEach(appointment -> {
+            if (appointment.getPrivacy().equals(AppointmentPrivacy.PUBLIC))
+                publicAppointments.add(appointment);
+        });
+
+        return publicAppointments;
+    }
 }

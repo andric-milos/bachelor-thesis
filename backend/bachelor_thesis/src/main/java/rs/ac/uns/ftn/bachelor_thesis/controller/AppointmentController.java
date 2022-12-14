@@ -5,10 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import rs.ac.uns.ftn.bachelor_thesis.dto.AppointmentDTO;
-import rs.ac.uns.ftn.bachelor_thesis.dto.CreateGameDTO;
-import rs.ac.uns.ftn.bachelor_thesis.dto.GameBasicInfoDTO;
-import rs.ac.uns.ftn.bachelor_thesis.dto.NewAppointmentDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.*;
 import rs.ac.uns.ftn.bachelor_thesis.enumeration.AppointmentPrivacy;
 import rs.ac.uns.ftn.bachelor_thesis.model.Appointment;
 import rs.ac.uns.ftn.bachelor_thesis.model.Game;
@@ -19,9 +16,7 @@ import rs.ac.uns.ftn.bachelor_thesis.service.GroupService;
 import rs.ac.uns.ftn.bachelor_thesis.service.PlayerService;
 import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 @RestController
@@ -184,5 +179,30 @@ public class AppointmentController {
         }
 
         return new ResponseEntity<>(false, HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllPublicAppointments() {
+        List<Appointment> publicAppointments = appointmentService.getAllPublicAppointments();
+        List<AppointmentDTO> dto = new ArrayList<>();
+
+        publicAppointments.forEach(appointment -> {
+            dto.add(AppointmentDTO.builder()
+                    .id(appointment.getId())
+                    .date(appointment.getDate().getTime())
+                    .capacity(appointment.getCapacity())
+                    .occupancy(appointment.getOccupancy())
+                    .price(appointment.getPrice())
+                    .location(new LocationDTO(
+                            appointment.getLocation().getId(),
+                            appointment.getLocation().getAddress(),
+                            appointment.getLocation().getLongitude(),
+                            appointment.getLocation().getLatitude()))
+                    .groupName(appointment.getGroup().getName())
+                    .build()
+            );
+        });
+
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 }

@@ -1,8 +1,6 @@
 package rs.ac.uns.ftn.bachelor_thesis.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import rs.ac.uns.ftn.bachelor_thesis.enumeration.TeamColor;
 import rs.ac.uns.ftn.bachelor_thesis.model.Appointment;
 import rs.ac.uns.ftn.bachelor_thesis.model.Game;
@@ -14,6 +12,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class AppointmentDTO {
     private Long id;
     private Long date;
