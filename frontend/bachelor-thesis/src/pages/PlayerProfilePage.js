@@ -11,35 +11,10 @@ function PlayerProfilePage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get("http://localhost:8080/user/whoami", {headers: {'Authorization' : 'Bearer ' + localStorage.getItem("accessToken")}})
-            .then(response => {
-                console.log(response);
-
-                if (!response.data.roles.find(element => element === "ROLE_PLAYER")) {
-                    navigate("/forbidden");
-                }
-            })
-            .catch(error => {
-                navigate("/forbidden");
-            });
-
         axios.get("http://localhost:8080/player/email/" + localStorage.getItem("subject"))
             .then(response => {
                 console.log(response);
-
-                setPlayerData({
-                    id: response.data.id,
-                    email: response.data.email,
-                    firstName: response.data.firstName,
-                    lastName: response.data.lastName,
-                    telephone: response.data.telephone,
-                    numberOfGoals: response.data.numberOfGoals,
-                    numberOfGames: response.data.numberOfGames,
-                    numberOfGamesWon: response.data.numberOfGamesWon,
-                    winningPercentage: response.data.winningPercentage,
-                    goalsPerAppointment: response.data.goalsPerAppointment,
-                    canceledJustBefore: response.data.canceledJustBefore
-                });
+                setPlayerData(response.data);
             })
             .catch(error => {
                 console.log(error);
@@ -48,7 +23,6 @@ function PlayerProfilePage() {
             axios.get("http://localhost:8080/group/my", {headers: {'Authorization' : 'Bearer ' + localStorage.getItem("accessToken")}})
                 .then(response => {
                     console.log(response);
-
                     setGroups(response.data);
                 })
                 .catch(error => {
