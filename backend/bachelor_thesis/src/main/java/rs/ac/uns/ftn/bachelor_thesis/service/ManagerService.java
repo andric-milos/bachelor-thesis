@@ -53,4 +53,8 @@ public class ManagerService {
 
         return 0;
     }
+
+    public Optional<Manager> getManagerByEmail(String email) {
+        return managerRepository.findByEmail(email);
+    }
 }
