@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import { useNavigate, useParams } from "react-router-dom";
+import GamePreviewModal from "../components/modals/GamePreviewModal";
 import NewGameModal from "../components/modals/NewGameModal";
 
 function AppointmentPage() {
@@ -161,7 +162,7 @@ function AppointmentPage() {
                 <div className="d-flex flex-column col-sm-6">
                     <div className="d-flex flex-row justify-content-between">
                         <h3><b>Attending players [{appointmentState.occupancy}/{appointmentState.capacity}]</b></h3>
-                        {!attendingState ? 
+                        {!attendingState ?
                             <Button variant="primary" onClick={onClickAttendHandler}>Attend</Button> :
                             <Button variant="secondary" onClick={onClickCancelHandler}>Cancel</Button>
                         }
@@ -186,13 +187,15 @@ function AppointmentPage() {
 
                     {appointmentState.games.length != 0 ? appointmentState.games.map(game => {
                         return (
-                            <div className="card my-1" key={`div-card-game-${game.id}`}>
-                                <div className="card-body d-flex flex-column" key={`div-cardBody-player-${game.id}`}>
-                                    <label className="h1" align="center" key={`label-game-${game.id}`}>
-                                        <b>Team Red {game.goalsTeamRed} - {game.goalsTeamBlue} Team Blue</b>
-                                    </label>
+                            <GamePreviewModal gameId={game.id} key={game.id}>
+                                <div className="card my-1" key={`div-card-game-${game.id}`}>
+                                    <div className="card-body d-flex flex-column" key={`div-cardBody-player-${game.id}`}>
+                                        <label className="h1" align="center" key={`label-game-${game.id}`}>
+                                            <b>Team Red {game.goalsTeamRed} - {game.goalsTeamBlue} Team Blue</b>
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
+                            </GamePreviewModal>
                         )
                     }) : <label>There are no games added.</label>}
                 </div>
