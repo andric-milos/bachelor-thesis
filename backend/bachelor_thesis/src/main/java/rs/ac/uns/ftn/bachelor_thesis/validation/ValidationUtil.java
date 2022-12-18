@@ -164,4 +164,17 @@ public class ValidationUtil {
 
         return true;
     }
+
+    public boolean validateSportsFacilityDTO(SportsFacilityDTO dto) {
+        if (dto.getLocation().getAddress() == null || dto.getLocation().getAddress().equals(""))
+            return false;
+
+        if (dto.getName() == null || dto.getName().equals(""))
+            return false;
+
+        if (dto.getPricePerHour() < 0.0)
+            return false;
+
+        return true;
+    }
 }

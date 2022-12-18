@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 public class Manager extends User {
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "sports_facility_id")
     private SportsFacility sportsFacility;
 }
