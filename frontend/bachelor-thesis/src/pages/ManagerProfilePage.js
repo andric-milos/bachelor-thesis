@@ -27,19 +27,18 @@ function ManagerProfilePage({ managerEmail }) {
 
             <div className="d-flex flex-column col-sm-7">
                 <h1>Sports facility</h1>
-                
+
                 {manager.sportsFacility ?
-                    <div>
-                        <label><b>Name: GDM sportski centar</b></label>
-                        <label><b>Open hours: 12-24</b></label>
-                        <label><b>Price per hour: 3800 RSD</b></label>
-                        <label><b>Address: Hajduk Veljkova 11</b></label>
+                    <>
+                        <label><b>Name: {manager.sportsFacility.name}</b></label>
+                        <label><b>Price per hour: {manager.sportsFacility.pricePerHour} RSD</b></label>
+                        <label><b>Address: {manager.sportsFacility.location.address}</b></label>
                         <img src="https://joomly.net/frontend/web/images/googlemap/map.png" alt="map icon" />
-                    </div> :
-                    <div>
+                    </> :
+                    <>
                         <label>You haven't added a sports facility.</label>
                         <AddSportsFacilityModal />
-                    </div>
+                    </>
                 }
             </div>
         </div>

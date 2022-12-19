@@ -102,6 +102,12 @@ public class BachelorThesisApplication {
 
 			dto = new RegisterInfoDTO("Nikolina", "Petkovic", "ninapetkovic@gmail.com", "1234", "060119811", "manager");
 			managerService.registerManager(dto);
+			dto = new RegisterInfoDTO("Marijana", "Marijanovic", "marijana@gmail.com", "1234", "060118111", "manager");
+			managerService.registerManager(dto);
+			dto = new RegisterInfoDTO("Marko", "Marinkovic", "marinkovicm@gmail.com", "1234", "060119811", "manager");
+			managerService.registerManager(dto);
+			dto = new RegisterInfoDTO("Miloš", "Andrić", "andric10@gmail.com", "1234", "060119811", "manager");
+			managerService.registerManager(dto);
 
 			// Creating a group
 			Optional<Player> MilosAndric = playerService.getPlayerByEmail("andric8@gmail.com");
