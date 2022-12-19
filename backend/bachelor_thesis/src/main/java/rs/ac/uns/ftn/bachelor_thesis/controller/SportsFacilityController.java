@@ -4,10 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.bachelor_thesis.dto.SportsFacilityDTO;
 import rs.ac.uns.ftn.bachelor_thesis.model.Manager;
 import rs.ac.uns.ftn.bachelor_thesis.model.SportsFacility;
@@ -51,5 +48,10 @@ public class SportsFacilityController {
         SportsFacility facility = sportsFacilityService.createSportsFacility(dto, manager.get());
 
         return new ResponseEntity<>(new SportsFacilityDTO(facility), HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllSportsFacilities() {
+        return new ResponseEntity<>(sportsFacilityService.getAllSportsFacilities(), HttpStatus.OK);
     }
 }
