@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import AddSportsFacilityModal from "../components/modals/AddSportsFacilityModal";
 import UserInfo from "../components/UserInfo";
 
 function ManagerProfilePage({ managerEmail }) {
@@ -26,16 +27,20 @@ function ManagerProfilePage({ managerEmail }) {
 
             <div className="d-flex flex-column col-sm-7">
                 <h1>Sports facility</h1>
-                {manager.sportsFacility ? 
+                
+                {manager.sportsFacility ?
                     <div>
                         <label><b>Name: GDM sportski centar</b></label>
                         <label><b>Open hours: 12-24</b></label>
                         <label><b>Price per hour: 3800 RSD</b></label>
                         <label><b>Address: Hajduk Veljkova 11</b></label>
                         <img src="https://joomly.net/frontend/web/images/googlemap/map.png" alt="map icon" />
+                    </div> :
+                    <div>
+                        <label>You haven't added a sports facility.</label>
+                        <AddSportsFacilityModal />
                     </div>
-                : <label>You haven't added a sports facility.</label>}
-                
+                }
             </div>
         </div>
     )
