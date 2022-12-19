@@ -10,6 +10,7 @@ import GroupPage from './pages/GroupPage';
 import ErrorPage from './pages/ErrorPage';
 import AppointmentPage from './pages/AppointmentPage';
 import ProfilePage from './pages/ProfilePage';
+import SportsFacilitiesPage from './pages/SportsFacilitiesPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path='/error' element={ <ErrorPage /> } />
         <Route path='/appointment/:appointmentId' element={ <AppointmentPage /> } />
         <Route path='/profile' element={ <ProfilePage /> } />
+        <Route path='/facilities' element={ <SportsFacilitiesPage /> } />
       </Routes>
     </div>
   );
