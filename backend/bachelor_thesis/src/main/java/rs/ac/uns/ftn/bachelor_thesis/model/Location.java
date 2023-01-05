@@ -30,6 +30,6 @@ public class Location {
     public Location(String address, double longitude, double latitude) {
         this.address = address;
         this.longitude = longitude;
-        this.longitude = latitude;
+        this.latitude = latitude;
     }
 }

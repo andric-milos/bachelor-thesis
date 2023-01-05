@@ -65,7 +65,6 @@ function MainNavigation() {
                             <button type='button' className='btn btn-dark' onClick={logout}>Logout</button>
                         </li> : null
                     }
-
                 </ul>
             </nav>
         </header>
