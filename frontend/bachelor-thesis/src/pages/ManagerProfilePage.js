@@ -33,7 +33,7 @@ function ManagerProfilePage({ managerEmail }) {
                         <label><b>Name: {manager.sportsFacility.name}</b></label>
                         <label><b>Price per hour: {manager.sportsFacility.pricePerHour} RSD</b></label>
                         <label><b>Address: {manager.sportsFacility.location.address}</b></label>
-                        <img src="https://joomly.net/frontend/web/images/googlemap/map.png" alt="map icon" />
+                        <img src="gdmMap.PNG" alt="map icon" />
                     </> :
                     <>
                         <label>You haven't added a sports facility.</label>
