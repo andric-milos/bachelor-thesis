@@ -35,9 +35,9 @@ function MainNavigation() {
 
     return (
         <header className={classes.header}>
-            <nav>
-                <ul>
-                    <div className='d-flex flex-row'>
+            <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+                <nav>
+                    <ul>
                         <li>
                             <Link to='/'>Homepage</Link>
                         </li>
@@ -59,14 +59,10 @@ function MainNavigation() {
                         <li>
                             <Link to='/facilities'>Facilities</Link>
                         </li>
-                    </div>
-                    {role != null ?
-                        <li>
-                            <button type='button' className='btn btn-dark' onClick={logout}>Logout</button>
-                        </li> : null
-                    }
-                </ul>
-            </nav>
+                    </ul>
+                </nav>
+                {role != null ? <button type='button' className='btn btn-dark' onClick={logout}>Logout</button> : null}
+            </div>
         </header>
     );
 }
