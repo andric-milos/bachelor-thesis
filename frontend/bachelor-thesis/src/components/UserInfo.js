@@ -1,3 +1,5 @@
+import UpdateProfileModal from "./modals/UpdateProfileModal";
+
 function UserInfo(props) {
     return (
         <div className="d-flex flex-column col-sm-4">
@@ -8,7 +10,8 @@ function UserInfo(props) {
             <label className="p-2"><b>Telephone: {props.telephone}</b></label>
 
             <br></br>
-            <button type="submit" className="btn btn-primary">Update information</button>
+            {/* <button type="submit" className="btn btn-primary">Update information</button> */}
+            <UpdateProfileModal style={{width: "100%"}} />
             <br></br>
             <button type="submit" className="btn btn-primary">Change password</button>
         </div>
