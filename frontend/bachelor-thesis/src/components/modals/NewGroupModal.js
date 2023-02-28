@@ -9,7 +9,6 @@ import ToggleButton from "react-bootstrap/ToggleButton";
 function NewGroupModal(props) {
     const [show, setShow] = useState(false);
     const [players, setPlayers] = useState([]);
-    const [checked, setChecked] = useState([]);
     const [selectedPlayers, setSelectedPlayers] = useState([]);
 
     const nameInputRef = useRef();
@@ -19,45 +18,41 @@ function NewGroupModal(props) {
     const handleClose = () => {
         setShow(false);
         setSelectedPlayers([]);
-        initializeCheckedArray(players.length);
-    }
+    };
 
-    const handleShow = () => setShow(true);    
+    const handleShow = () => setShow(true);
 
     // Fetching players from the database, when the component is mounted.
     useEffect(() => {
         axios.get("http://localhost:8080/player/")
             .then(response => {
                 setPlayers(response.data);
-                initializeCheckedArray(response.data.length);
             })
             .catch(error => {
                 console.log(error);
             });
     }, []);
 
-    const selectPlayerHandler = (event, email, checkedIndex) => {
-        if (!selectedPlayers.find(element => element === email)) {
+    const selectPlayerHandler = (event, email) => {
+        if (!isPlayerSelected(email)) {
             event.target.textContent = "Selected";
             changeSelectedPlayersStateImmutably("ADD", email);
-            changeCheckedStateImmutably(checkedIndex, true);
         } else {
             event.target.textContent = "Select";
             changeSelectedPlayersStateImmutably("REMOVE", email);
-            changeCheckedStateImmutably(checkedIndex, false);
         }
-    }
+    };
 
     const createGroupHandler = () => {
         let dto = {
-            "name" : nameInputRef.current.value,
-            "playersEmails" : selectedPlayers
+            "name": nameInputRef.current.value,
+            "playersEmails": selectedPlayers
         };
 
         // console.log(selectedPlayers);
         console.log(dto);
 
-        axios.post("http://localhost:8080/group/", dto, {headers: {'Authorization' : 'Bearer ' + localStorage.getItem("accessToken")}})
+        axios.post("http://localhost:8080/group/", dto, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") } })
             .then(response => {
                 alert("You successfully created a new group!");
                 navigate(0); // Refreshing.
@@ -66,21 +61,7 @@ function NewGroupModal(props) {
                 console.log(error);
                 alert(error.message);
             });
-    }
-
-    const initializeCheckedArray = (length) => {
-        let tmpChecked = [];
-        for (let i = 0; i < length; i++) {
-            tmpChecked.push(false);
-        }
-        setChecked(tmpChecked);
-    }
-
-    const changeCheckedStateImmutably = (index, value) => {
-        const tmpChecked = checked.slice();
-        tmpChecked[index] = value;
-        setChecked(tmpChecked);
-    }
+    };
 
     const changeSelectedPlayersStateImmutably = (addOrRemove, email) => {
         const tmpSelectedPlayers = selectedPlayers.slice();
@@ -91,7 +72,15 @@ function NewGroupModal(props) {
             tmpSelectedPlayers.splice(tmpSelectedPlayers.indexOf(email), 1);
         }
         setSelectedPlayers(tmpSelectedPlayers);
-    }
+    };
+
+    const isPlayerSelected = (email) => {
+        if (selectedPlayers.find(element => element === email)) {
+            return true;
+        } else {
+            return false;
+        }
+    };
 
     return (
         <div>
@@ -103,7 +92,7 @@ function NewGroupModal(props) {
                 </Modal.Header>
                 <Modal.Body>
                     <div className="d-flex d-row m-1">
-                        <label className="p-2"><b>Name:</b></label>
+                        <label className="p-2" style={{ width: "35%" }}><b>Group name:</b></label>
                         <input type="text" className="p-2 w-100" id="name" ref={nameInputRef}></input>
                     </div>
 
@@ -111,13 +100,13 @@ function NewGroupModal(props) {
                         return (
                             <div key={`div-${player.id}`} className="d-flex flex-row justify-content-between m-1">
                                 <p key={`p-${player.id}`} className="px-2"><b>{player.email} ({player.firstName} {player.lastName})</b></p>
-                                <ToggleButton 
+                                <ToggleButton
                                     key={`tb-${player.id}`}
                                     id={`radio-${index}`}
-                                    variant="outline-success" 
-                                    type="checkbox" 
-                                    onClick={event => selectPlayerHandler(event, player.email, index)}
-                                    checked={checked[index]}
+                                    variant="outline-success"
+                                    type="checkbox"
+                                    onClick={event => selectPlayerHandler(event, player.email)}
+                                    checked={isPlayerSelected(player.email)}
                                 >Select</ToggleButton>
                             </div>
                         )
