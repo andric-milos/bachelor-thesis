@@ -29,7 +29,7 @@ function AddSportsFacilityModal() {
 
             axios.post("http://localhost:8080/sportsFacility", dto, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") } })
                 .then(response => {
-                    if (response.status == 200) {
+                    if (response.status === 200) {
                         alert("You successfully added a sports facility!");
                         navigate(0);
                     }
@@ -73,6 +73,8 @@ function AddSportsFacilityModal() {
                             <label ><b>Name:</b></label>
                             <input type="text" className="p-2" ref={nameInputRef}></input>
                         </div>
+
+                        <img className="p-1" src="/limanska_pijaca_mapa.PNG" alt="Mapa Limanske pijace" />
 
                         <div className="d-flex flex-column m-1">
                             <label ><b>Address:</b></label>
