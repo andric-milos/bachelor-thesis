@@ -51,7 +51,7 @@ function PlayerProfilePage() {
                 <label><b>Number of games won: {playerData.numberOfGamesWon}</b></label>
                 <label><b>Overall number of goals scored: {playerData.numberOfGoals}</b></label>
                 <label><b>Goals per appointment: {playerData.goalsPerAppointment}</b></label>
-                <label><b>Winning percentage: {playerData.winningPercentage} %</b></label>
+                <label><b>Winning percentage: {playerData.winningPercentage.toFixed(2)} %</b></label>
 
                 <br></br><br></br><br></br>
                 <div className="d-flex flex-row justify-content-between">
