@@ -33,7 +33,7 @@ function PlayerProfilePage() {
     const navigateToGroupPage = (groupId) => {
         // console.log(groupId);
         navigate("/group/" + groupId);
-    }
+    };
 
     return (
         <div className="d-flex p-2 mt-5 m-2 justify-content-between">
@@ -51,7 +51,7 @@ function PlayerProfilePage() {
                 <label><b>Number of games won: {playerData.numberOfGamesWon}</b></label>
                 <label><b>Overall number of goals scored: {playerData.numberOfGoals}</b></label>
                 <label><b>Goals per appointment: {playerData.goalsPerAppointment}</b></label>
-                <label><b>Winning percentage: {playerData.winningPercentage.toFixed(2)} %</b></label>
+                <label><b>Winning percentage: {playerData.winningPercentage ? playerData.winningPercentage.toFixed(2) : null} %</b></label>
 
                 <br></br><br></br><br></br>
                 <div className="d-flex flex-row justify-content-between">
