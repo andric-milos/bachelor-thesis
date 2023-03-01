@@ -37,9 +37,9 @@ function AppointmentPage() {
             })
             .catch(error => {
                 try {
-                    if (error.response.status == 403) {
+                    if (error.response.status === 403) {
                         navigate("/forbidden");
-                    } else if (error.response.status == 404) {
+                    } else if (error.response.status === 404) {
                         navigate("/error");
                     }
                 } catch (exception) {
@@ -52,7 +52,7 @@ function AppointmentPage() {
             .then(response => {
                 console.log(response);
 
-                if (response.status == 200) {
+                if (response.status === 200) {
                     setAttendingState(response.data);
                 }
             })
@@ -60,7 +60,7 @@ function AppointmentPage() {
                 console.log(error);
 
                 try {
-                    if (error.response.status == 404) {
+                    if (error.response.status === 404) {
                         navigate("/error");
                     }
                 } catch (exception) {
@@ -87,7 +87,7 @@ function AppointmentPage() {
     const onClickAttendHandler = () => {
         axios.put("http://localhost:8080/appointment/attend/" + appointmentId, {}, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") } })
             .then(response => {
-                if (response.status == 200) {
+                if (response.status === 200) {
                     alert("You successfully applied to attend the appointment!");
                     navigate(0);
                 }
@@ -96,13 +96,13 @@ function AppointmentPage() {
                 console.log(error);
 
                 try {
-                    if (error.response.status == 403) {
+                    if (error.response.status === 403) {
                         navigate("/forbidden");
-                    } else if (error.response.status == 404) {
+                    } else if (error.response.status === 404) {
                         navigate("/error");
-                    } else if (error.response.status == 400) {
+                    } else if (error.response.status === 400) {
                         alert(error.response.data);
-                    } else if (error.response.status == 500) {
+                    } else if (error.response.status === 500) {
                         alert(error.response.data);
                     }
                 } catch (exception) {
@@ -115,7 +115,7 @@ function AppointmentPage() {
     const onClickCancelHandler = () => {
         axios.put("http://localhost:8080/appointment/cancel/" + appointmentId, {}, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") } })
             .then(response => {
-                if (response.status == 200) {
+                if (response.status === 200) {
                     alert("You successfully canceled the appointment!");
                     navigate(0);
                 }
@@ -124,13 +124,13 @@ function AppointmentPage() {
                 console.log(error);
 
                 try {
-                    if (error.response.status == 403) {
+                    if (error.response.status === 403) {
                         navigate("/forbidden");
-                    } else if (error.response.status == 404) {
+                    } else if (error.response.status === 404) {
                         navigate("/error");
-                    } else if (error.response.status == 400) {
+                    } else if (error.response.status === 400) {
                         alert(error.response.data);
-                    } else if (error.response.status == 500) {
+                    } else if (error.response.status === 500) {
                         alert(error.response.data);
                     }
                 } catch (exception) {
@@ -144,7 +144,7 @@ function AppointmentPage() {
         <div className="d-flex flex-column p-2 mt-5 m-2 justify-content-center">
             <div className="d-flex flex-row mt-4">
                 <div className="d-flex flex-column col-sm-6">
-                    <img src="https://joomly.net/frontend/web/images/googlemap/map.png" alt="map icon" />
+                    <img src="/bulevar_cara_lazara_83.PNG" alt="map icon" />
                 </div>
                 <div className="d-flex flex-column col-sm-6 mx-3">
                     <h1><b>{appointmentState.groupName}</b></h1>
@@ -168,7 +168,7 @@ function AppointmentPage() {
                         }
                     </div>
 
-                    {appointmentState.playersEmails.length != 0 ? appointmentState.playersEmails.map((email, index) => {
+                    {appointmentState.playersEmails.length !== 0 ? appointmentState.playersEmails.map((email, index) => {
                         return (
                             <div className="card my-1" key={`div-card-player-${index}`}>
                                 <div className="card-body" key={`div-cardBody-player-${index}`}>
@@ -185,7 +185,7 @@ function AppointmentPage() {
                         <NewGameModal players={appointmentState.playersEmails} />
                     </div>
 
-                    {appointmentState.games.length != 0 ? appointmentState.games.map(game => {
+                    {appointmentState.games.length !== 0 ? appointmentState.games.map(game => {
                         return (
                             <GamePreviewModal gameId={game.id} key={game.id}>
                                 <div className="card my-1" key={`div-card-game-${game.id}`}>
