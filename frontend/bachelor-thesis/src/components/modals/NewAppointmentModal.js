@@ -51,7 +51,7 @@ function NewAppointmentModal(props) { // Pass group id as a prop.
                 .then(response => {
                     console.log(response);
 
-                    if (response.status == 200) {
+                    if (response.status === 200) {
                         alert("You successfully added a new appointment!");
                         navigate(0);
                     }
@@ -157,6 +157,8 @@ function NewAppointmentModal(props) { // Pass group id as a prop.
                                 <label className="text-danger" ref={capacityErrorLabelRef}></label>
                             </div>
                         </div>
+
+                        <img className="p-1" src="/limanska_pijaca_mapa.PNG" alt="Mapa Limanske pijace" />
 
                         <div className="d-flex flex-column m-1">
                             <label ><b>Address:</b></label>
