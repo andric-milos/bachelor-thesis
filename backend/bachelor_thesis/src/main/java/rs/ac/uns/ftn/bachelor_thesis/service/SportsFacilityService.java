@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.bachelor_thesis.dto.SportsFacilityDTO;
 import rs.ac.uns.ftn.bachelor_thesis.exception.CustomizableBadRequestException;
 import rs.ac.uns.ftn.bachelor_thesis.exception.UnauthorizedException;
-import rs.ac.uns.ftn.bachelor_thesis.exception.InvalidDataException;
+import rs.ac.uns.ftn.bachelor_thesis.exception.InvalidInputDataException;
 import rs.ac.uns.ftn.bachelor_thesis.model.Location;
 import rs.ac.uns.ftn.bachelor_thesis.model.Manager;
 import rs.ac.uns.ftn.bachelor_thesis.model.SportsFacility;
@@ -37,7 +37,7 @@ public class SportsFacilityService {
         // Manager needs to pass an object which contains following fields: location, name, pricePerHour.
 
         if (!validationUtil.validateSportsFacilityDTO(dto))
-            throw new InvalidDataException("Invalid input of data!");
+            throw new InvalidInputDataException("Invalid input of data!");
 
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Manager manager = managerService.getManagerByEmail(email)

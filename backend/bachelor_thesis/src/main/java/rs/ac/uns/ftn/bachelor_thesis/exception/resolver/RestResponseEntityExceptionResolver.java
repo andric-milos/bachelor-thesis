@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import rs.ac.uns.ftn.bachelor_thesis.exception.CustomizableBadRequestException;
 import rs.ac.uns.ftn.bachelor_thesis.exception.UnauthorizedException;
-import rs.ac.uns.ftn.bachelor_thesis.exception.InvalidDataException;
+import rs.ac.uns.ftn.bachelor_thesis.exception.InvalidInputDataException;
 import rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException;
 
 @ControllerAdvice
@@ -16,8 +16,8 @@ public class RestResponseEntityExceptionResolver {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(InvalidDataException.class)
-    public ResponseEntity<?> resolveInvalidDataException(InvalidDataException e) {
+    @ExceptionHandler(InvalidInputDataException.class)
+    public ResponseEntity<?> resolveInvalidDataException(InvalidInputDataException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
