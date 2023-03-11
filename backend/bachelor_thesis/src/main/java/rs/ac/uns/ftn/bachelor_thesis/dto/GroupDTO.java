@@ -14,7 +14,7 @@ import java.util.Set;
 public class GroupDTO {
     private Long id;
     private String name;
-    private Set<String> playersEmails;
+    private Set<String> playersEmails = new HashSet<>();
 
     public GroupDTO(Group group) {
         this.id = group.getId();
