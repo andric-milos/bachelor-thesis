@@ -4,12 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import rs.ac.uns.ftn.bachelor_thesis.dto.PlayerDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.PlayerWithStatisticsDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
+import rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException;
 import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.repository.PlayerRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,8 +25,15 @@ public class PlayerService {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
-    public List<Player> getAllPlayers() {
-        return playerRepository.findAll();
+    public List<PlayerDTO> getAllPlayers() {
+        List<PlayerDTO> playersDto = new ArrayList<>();
+
+        List<Player> players = playerRepository.findAll();
+        players.forEach(player -> {
+            playersDto.add(new PlayerDTO(player));
+        });
+
+        return playersDto;
     }
 
     public Optional<Player> getPlayerByEmail(String email) {
@@ -31,6 +42,22 @@ public class PlayerService {
 
     public Optional<Player> getPlayerById(Long id) {
         return playerRepository.findById(id);
+    }
+
+    public PlayerWithStatisticsDTO getPlayerDtoByEmail(String email) {
+        Player player = playerRepository.findByEmail(email).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Player with an email %s doesn't exist!", email))
+        );
+
+        return new PlayerWithStatisticsDTO(player);
+    }
+
+    public PlayerDTO getPlayerDtoById(Long id) {
+        Player player = playerRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Player with an id %d doesn't exist!", id))
+        );
+
+        return new PlayerDTO(player);
     }
 
     /**
