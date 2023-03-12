@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import rs.ac.uns.ftn.bachelor_thesis.dto.ManagerDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
+import rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException;
 import rs.ac.uns.ftn.bachelor_thesis.model.Manager;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
@@ -56,5 +58,13 @@ public class ManagerService {
 
     public Optional<Manager> getManagerByEmail(String email) {
         return managerRepository.findByEmail(email);
+    }
+
+    public ManagerDTO getManagerDtoByEmail(String email) {
+        Manager manager = managerRepository.findByEmail(email).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Manager with an email %s doesn't exist!", email))
+        );
+
+        return new ManagerDTO(manager);
     }
 }
