@@ -6,11 +6,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.bachelor_thesis.dto.ManagerDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
+import rs.ac.uns.ftn.bachelor_thesis.exception.InternalServerErrorException;
 import rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException;
 import rs.ac.uns.ftn.bachelor_thesis.model.Manager;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
-import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.repository.ManagerRepository;
+import rs.ac.uns.ftn.bachelor_thesis.repository.RoleRepository;
 
 import java.util.Optional;
 
@@ -20,19 +21,22 @@ import java.util.Optional;
 public class ManagerService {
     private final ManagerRepository managerRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserService userService;
+    private final RoleRepository roleRepository;
 
     /**
      * Receives previously validated RegisterInfoDTO object, creates Manager object
      * from it and saves it in the database.
      *
      * @param dto
-     * @return 0 if manager is successfully registered, 1 if role is
-     * not found in the database, 2 if email is already taken
+     * @return registered Manager object
      */
-    public int registerManager(RegisterInfoDTO dto) {
+    public Manager registerManager(RegisterInfoDTO dto) {
         log.info("Registering a new manager: {}", dto.getEmail());
+        Manager manager = createManagerFromRegisterInfoDTO(dto);
+        return managerRepository.save(manager);
+    }
 
+    private Manager createManagerFromRegisterInfoDTO(RegisterInfoDTO dto) {
         Manager manager = new Manager();
         manager.setFirstName(dto.getFirstName());
         manager.setLastName(dto.getLastName());
@@ -40,20 +44,13 @@ public class ManagerService {
         manager.setPassword(passwordEncoder.encode(dto.getPassword()));
         manager.setTelephone(dto.getTelephone());
 
-        Optional<Role> roleManager = userService.getRoleByName("ROLE_MANAGER");
-        if (roleManager.isEmpty()) {
-            return 1;
-        }
+        Role roleManager = roleRepository.findByName("ROLE_MANAGER").orElseThrow(
+                () -> new InternalServerErrorException("Role ROLE_MANAGER doesn't exist!")
+        );
 
-        Optional<User> user = userService.getUserByEmail(dto.getEmail());
-        if (user.isPresent()) {
-            return 2;
-        }
+        manager.getRoles().add(roleManager);
 
-        manager.getRoles().add(roleManager.get());
-        managerRepository.save(manager);
-
-        return 0;
+        return manager;
     }
 
     public Optional<Manager> getManagerByEmail(String email) {

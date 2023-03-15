@@ -8,15 +8,19 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.bachelor_thesis.dto.LoginInfoDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.TokensDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.UserDTO;
+import rs.ac.uns.ftn.bachelor_thesis.exception.CustomizableBadRequestException;
+import rs.ac.uns.ftn.bachelor_thesis.exception.UnauthorizedException;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.repository.RoleRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.UserRepository;
 import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
+import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,66 +31,52 @@ import java.util.stream.Collectors;
 public class UserService{
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
     private final TokenUtil tokenUtil;
     private final AuthenticationManager authenticationManager;
-
-    public User saveUser(User user) {
-        log.info("Saving new user {} to the database", user.getEmail());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
-    }
-
-    public Role saveRole(Role role) {
-        log.info("Saving new role {} to the database", role.getName());
-        return roleRepository.save(role);
-    }
-
-    public void addRoleToUser(String email, String roleName) {
-        log.info("Adding role {} to user {}", roleName, email);
-
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        Optional<Role> roleOptional = roleRepository.findByName(roleName);
-
-        if (userOptional.isPresent() && roleOptional.isPresent()) {
-            User user = userOptional.get();
-            user.getRoles().add(roleOptional.get());
-
-            userRepository.save(user); // this line is redundant, if we put @Transactional annotation above the class declaration
-            log.info("Role {} successfully added to user {}", roleName, email);
-        } else {
-            log.info("Either role {} or user {} not found in the database!", roleName, email);
-        }
-    }
+    private final ValidationUtil validationUtil;
+    private final PlayerService playerService;
+    private final ManagerService managerService;
 
     public Optional<User> getUserByEmail(String email) {
         log.info("Fetching user {} from the database", email);
         return userRepository.findByEmail(email);
     }
 
-    public List<User> getAllUsers() {
-        log.info("Fetching all users from the database");
-        return userRepository.findAll();
-    }
-
     public Optional<Role> getRoleByName(String roleName) {
         return roleRepository.findByName(roleName);
     }
 
-    public String renewToken(String refreshToken, String issuer) {
-        DecodedJWT decodedJWT = tokenUtil.verify(refreshToken);
+    public Map<String, String> renewToken(String refreshToken, String issuer) {
+        if (refreshToken != null) {
+            try {
+                DecodedJWT decodedJWT = tokenUtil.verify(refreshToken);
 
-        String email = decodedJWT.getSubject();
-        Optional<User> user = getUserByEmail(email);
+                String email = decodedJWT.getSubject();
+                Optional<User> user = getUserByEmail(email);
 
-        return tokenUtil.generateAccessToken(
-                user.get().getEmail(),
-                issuer,
-                user.get().getRoles().stream().map(Role::getName).collect(Collectors.toList())
-        );
+                String accessToken = tokenUtil.generateAccessToken(
+                        user.get().getEmail(),
+                        issuer,
+                        user.get().getRoles().stream().map(Role::getName).collect(Collectors.toList())
+                );
+
+                Map<String, String> tokens = new HashMap<>();
+                tokens.put("access_token", accessToken);
+                tokens.put("refresh_token", refreshToken);
+
+                return tokens;
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new UnauthorizedException(e.getMessage());
+            }
+        } else {
+            throw new CustomizableBadRequestException("Refresh token is missing!");
+        }
     }
 
     public TokensDTO login(LoginInfoDTO dto, String issuer) {
+        log.info("Email: {}, Password: {}", dto.getEmail(), dto.getPassword());
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         dto.getEmail(),
@@ -110,15 +100,34 @@ public class UserService{
                 issuer
         );
 
-        HashMap<String, String> tokens = new HashMap<>();
-        tokens.put("access_token", accessToken);
-        tokens.put("refresh_token", refreshToken);
-
         DecodedJWT decodedJWT = tokenUtil.verify(accessToken);
         String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
 
-        TokensDTO tokensDTO = new TokensDTO(accessToken, refreshToken, dto.getEmail(), issuer, roles, decodedJWT.getExpiresAt().getTime());
+        return new TokensDTO(accessToken, refreshToken, dto.getEmail(), issuer, roles, decodedJWT.getExpiresAt().getTime());
+    }
 
-        return tokensDTO;
+    public UserDTO whoAmI() {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UnauthorizedException("Not logged in!")
+        );
+
+        return new UserDTO(user);
+    }
+
+    public UserDTO register(RegisterInfoDTO dto) {
+        dto = validationUtil.trimAndValidateRegisterInfo(dto);
+
+        if (dto == null) throw new CustomizableBadRequestException("Invalid input of data!");
+
+        String email = dto.getEmail();
+        if (userRepository.findByEmail(email).isPresent())
+            throw new CustomizableBadRequestException(String.format("Email %s is already taken!", email));
+
+        // Role whitelisted values: "manager", "player"
+        String role = dto.getRole();
+        if (role.equals("player")) return new UserDTO(playerService.registerPlayer(dto));
+        else if (role.equals("manager")) return new UserDTO(managerService.registerManager(dto));
+        else throw new CustomizableBadRequestException(String.format("Role %s doesn't exist!", role));
     }
 }

@@ -7,11 +7,12 @@ import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.bachelor_thesis.dto.PlayerDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.PlayerWithStatisticsDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
+import rs.ac.uns.ftn.bachelor_thesis.exception.InternalServerErrorException;
 import rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException;
 import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
-import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.repository.PlayerRepository;
+import rs.ac.uns.ftn.bachelor_thesis.repository.RoleRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.Optional;
 public class PlayerService {
     private final PlayerRepository playerRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserService userService;
+    private final RoleRepository roleRepository;
 
     public List<PlayerDTO> getAllPlayers() {
         List<PlayerDTO> playersDto = new ArrayList<>();
@@ -65,12 +66,15 @@ public class PlayerService {
      * from it and saves it in the database.
      *
      * @param dto
-     * @return 0 if player is successfully registered, 1 if role is
-     * not found in the database, 2 if email is already taken
+     * @return registered Player object
      */
-    public int registerPlayer(RegisterInfoDTO dto) {
+    public Player registerPlayer(RegisterInfoDTO dto) {
         log.info("Registering a new player: {}", dto.getEmail());
+        Player player = createPlayerFromRegisterInfoDTO(dto);
+        return playerRepository.save(player);
+    }
 
+    private Player createPlayerFromRegisterInfoDTO(RegisterInfoDTO dto) {
         Player player = new Player();
         player.setFirstName(dto.getFirstName());
         player.setLastName(dto.getLastName());
@@ -78,20 +82,13 @@ public class PlayerService {
         player.setPassword(passwordEncoder.encode(dto.getPassword()));
         player.setTelephone(dto.getTelephone());
 
-        Optional<Role> rolePlayer = userService.getRoleByName("ROLE_PLAYER");
-        if (rolePlayer.isEmpty()) {
-            return 1;
-        }
+        Role rolePlayer = roleRepository.findByName("ROLE_PLAYER").orElseThrow(
+                () -> new InternalServerErrorException("Role ROLE_PLAYER doesn't exist!")
+        );
 
-        Optional<User> user = userService.getUserByEmail(dto.getEmail());
-        if (user.isPresent()) {
-            return 2;
-        }
+        player.getRoles().add(rolePlayer);
 
-        player.getRoles().add(rolePlayer.get());
-        playerRepository.save(player);
-
-        return 0;
+        return player;
     }
 
     /**
