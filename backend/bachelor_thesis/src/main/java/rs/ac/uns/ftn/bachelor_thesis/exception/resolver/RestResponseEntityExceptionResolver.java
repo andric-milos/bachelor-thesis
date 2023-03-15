@@ -4,10 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import rs.ac.uns.ftn.bachelor_thesis.exception.CustomizableBadRequestException;
-import rs.ac.uns.ftn.bachelor_thesis.exception.UnauthorizedException;
-import rs.ac.uns.ftn.bachelor_thesis.exception.InvalidInputDataException;
-import rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException;
+import rs.ac.uns.ftn.bachelor_thesis.exception.*;
 
 @ControllerAdvice
 public class RestResponseEntityExceptionResolver {
@@ -23,11 +20,16 @@ public class RestResponseEntityExceptionResolver {
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<?> resolveUnauthorizedException(UnauthorizedException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(CustomizableBadRequestException.class)
     public ResponseEntity<?> resolveCustomizableBadRequestException(CustomizableBadRequestException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InternalServerErrorException.class)
+    public ResponseEntity<?> resolveInternalServerErrorException(InternalServerErrorException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
