@@ -22,7 +22,7 @@ public class UserDTO {
         this.id = user.getId();
         this.email = user.getEmail();
         this.firstName = user.getFirstName();
-        this.lastName = user.getFirstName();
+        this.lastName = user.getLastName();
         this.telephone = user.getTelephone();
         user.getRoles().forEach(role -> {
             this.roles.add(role.getName());
