@@ -1,17 +1,24 @@
 package rs.ac.uns.ftn.bachelor_thesis.service;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rs.ac.uns.ftn.bachelor_thesis.dto.AppointmentDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.CreateGameDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.GameBasicInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.NewAppointmentDTO;
 import rs.ac.uns.ftn.bachelor_thesis.enumeration.AppointmentPrivacy;
 import rs.ac.uns.ftn.bachelor_thesis.enumeration.TeamColor;
+import rs.ac.uns.ftn.bachelor_thesis.exception.*;
+import rs.ac.uns.ftn.bachelor_thesis.mapper.AppointmentMapper;
 import rs.ac.uns.ftn.bachelor_thesis.model.*;
 import rs.ac.uns.ftn.bachelor_thesis.repository.AppointmentRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.GameRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.PlayerRepository;
+import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 public class AppointmentService {
@@ -20,40 +27,64 @@ public class AppointmentService {
     private PlayerService playerService;
     private GameRepository gameRepository;
     private PlayerRepository playerRepository;
+    private AppointmentMapper appointmentMapper;
+    private ValidationUtil validationUtil;
 
     public AppointmentService(AppointmentRepository appointmentRepository,
                               GroupService groupService,
                               PlayerService playerService,
                               GameRepository gameRepository,
-                              PlayerRepository playerRepository) {
+                              PlayerRepository playerRepository,
+                              AppointmentMapper appointmentMapper,
+                              ValidationUtil validationUtil) {
         this.appointmentRepository = appointmentRepository;
         this.groupService = groupService;
         this.playerService = playerService;
         this.gameRepository = gameRepository;
         this.playerRepository = playerRepository;
+        this.appointmentMapper = appointmentMapper;
+        this.validationUtil = validationUtil;
     }
 
-    public Appointment createAppointment(NewAppointmentDTO dto) {
-        Optional<Group> group = groupService.getGroupById(dto.getGroupId());
+    public AppointmentDTO createAppointment(NewAppointmentDTO dto) {
+        if (!validationUtil.validateNewAppointmentDTO(dto))
+            throw new InvalidInputDataException("Invalid input of data!");
 
-        if (group.isPresent()) {
-            Appointment newAppointment = new Appointment(
-                    group.get(),
-                    new Date(dto.getDate()),
-                    AppointmentPrivacy.valueOf(dto.getPrivacy().toUpperCase()),
-                    new Location(dto.getAddress(), 0.0, 0.0),
-                    dto.getCapacity(),
-                    dto.getPrice()
-            );
+        Group group = groupService.getGroupById(dto.getGroupId());
 
-            return appointmentRepository.save(newAppointment);
-        }
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Player player = playerService.getPlayerByEmail(email).orElseThrow(
+                () -> new UnauthorizedException("Unauthorized!")
+        );
 
-        return null;
+        if (!group.getPlayers().contains(player))
+            throw new UnauthorizedException("You're not in the group!");
+
+
+        Appointment newAppointment = new Appointment(
+                group,
+                new Date(dto.getDate()),
+                AppointmentPrivacy.valueOf(dto.getPrivacy().toUpperCase()),
+                new Location(dto.getAddress(), 0.0, 0.0),
+                dto.getCapacity(),
+                dto.getPrice()
+        );
+
+        return new AppointmentDTO(appointmentRepository.save(newAppointment));
     }
 
-    public Optional<Appointment> getAppointmentById(Long id) {
-        return appointmentRepository.findById(id);
+    public AppointmentDTO getAppointmentById(Long id) {
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Appointment with an id %d doesn't exist!", id))
+        );
+
+        /* Checking if the player has access to this data. */
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (appointment.getPrivacy().equals(AppointmentPrivacy.PRIVATE)
+                && !groupService.getPlayersEmails(appointment.getGroup()).contains(email))
+            throw new UnauthorizedException("You're not a member of the group!");
+
+        return new AppointmentDTO(appointment);
     }
 
     public Appointment addPlayerToAppointment(Appointment appointment, Player player) {
@@ -61,31 +92,43 @@ public class AppointmentService {
             if (appointment.getPlayers().add(player)) {
                 appointment.setOccupancy(appointment.getOccupancy() + 1);
                 return appointmentRepository.save(appointment);
+            } else {
+                throw new CustomizableBadRequestException("You are already attending this appointment!");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            throw new InternalServerErrorException("Something went wrong on the server!");
         }
-
-        return appointment;
     }
     
-    public boolean removePlayerFromAppointment(Appointment appointment, Player player) {
+    public Appointment removePlayerFromAppointment(Appointment appointment, Player player) {
         if (appointment.getPlayers().remove(player)) {
             appointment.setOccupancy(appointment.getOccupancy() - 1);
-            appointmentRepository.save(appointment);
-            return true;
+            return appointmentRepository.save(appointment);
+        } else {
+            throw new CustomizableBadRequestException("You are not attending this appointment!");
         }
-
-        return false;
     }
 
     @Transactional
-    public Game addGame(CreateGameDTO dto) {
-        Optional<Appointment> appointmentOptional = getAppointmentById(dto.getAppointmentId());
+    public GameBasicInfoDTO addGame(CreateGameDTO dto) {
+        if (!validationUtil.validateCreateGameDTO(dto))
+            throw new InvalidInputDataException("Invalid input of data!");
 
-        if (appointmentOptional.isEmpty())
-            return null;
+        Appointment appointment = appointmentRepository.findById(dto.getAppointmentId()).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Appointment with an id %d doesn't exist!", dto.getAppointmentId()))
+        );
+
+        if (!playerService.doPlayersExist(Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).toList()))
+            throw new CustomizableBadRequestException("You entered one or more non-existing players!");
+
+        String loggedInPlayersEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Player loggedInPlayer = playerService.getPlayerByEmail(loggedInPlayersEmail).orElseThrow(
+                () -> new UnauthorizedException("Unauthorized")
+        );
+
+        if (!appointment.getPlayers().contains(loggedInPlayer))
+            throw new UnauthorizedException("You are not an attendee of this appointment!");
 
         Set<Player> teamRedPlayers = new HashSet<>();
         dto.getTeamRed().forEach(email -> {
@@ -114,7 +157,6 @@ public class AppointmentService {
         });
 
         // Initializing a new game - adding teams to it and associating it with the appointment.
-        Appointment appointment = appointmentOptional.get();
         Team teamRed = Team.builder().players(teamRedPlayers).build();
         Team teamBlue = Team.builder().players(teamBluePlayers).build();
         Game game = Game.builder()
@@ -197,18 +239,77 @@ public class AppointmentService {
         }
 
         game.setGoals(goals);
-        return gameRepository.save(game);
+        return new GameBasicInfoDTO(gameRepository.save(game));
     }
 
-    public List<Appointment> getAllPublicAppointments() {
+    public List<AppointmentDTO> getAllPublicAppointments() {
         List<Appointment> appointments = appointmentRepository.findAll();
-        List<Appointment> publicAppointments = new ArrayList<>();
+        List<AppointmentDTO> publicAppointmentsDTO = new ArrayList<>();
 
         appointments.forEach(appointment -> {
             if (appointment.getPrivacy().equals(AppointmentPrivacy.PUBLIC))
-                publicAppointments.add(appointment);
+                publicAppointmentsDTO.add(appointmentMapper.fromEntityToDto(appointment));
         });
 
-        return publicAppointments;
+        return publicAppointmentsDTO;
+    }
+
+    public AppointmentDTO attendAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Appointment with an id %d doesn't exist!", id))
+        );
+
+        /* Checking if the player can attend this appointment. */
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (appointment.getPrivacy().equals(AppointmentPrivacy.PRIVATE)
+                && !groupService.getPlayersEmails(appointment.getGroup()).contains(email))
+            throw new UnauthorizedException("You're not a member of the group!");
+
+        if (appointment.getOccupancy() >= appointment.getCapacity())
+            throw new CustomizableBadRequestException("Full capacity!");
+
+        Player player = playerService.getPlayerByEmail(email).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Player with an email %s not found!", email))
+        );
+
+        return new AppointmentDTO(addPlayerToAppointment(appointment, player));
+    }
+
+    public AppointmentDTO cancelAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Appointment with an id %d doesn't exist!", id))
+        );
+
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Player player = playerService.getPlayerByEmail(email).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Player with an email %s not found!", email))
+        );
+
+        return new AppointmentDTO(removePlayerFromAppointment(appointment, player));
+    }
+
+    public boolean amIattending(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Appointment with an id %d doesn't exist!", appointmentId))
+        );
+
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        for (Player player : appointment.getPlayers()) {
+            if (player.getEmail().equals(email))
+                return true;
+        }
+
+        return false;
+    }
+
+    public Set<AppointmentDTO> getGroupsAppointments(Long groupId) {
+        Group group = groupService.getGroupById(groupId);
+
+        Set<AppointmentDTO> appointmentSet = new HashSet<>();
+        group.getAppointments().forEach(appointment -> {
+            appointmentSet.add(new AppointmentDTO(appointment));
+        });
+
+        return appointmentSet;
     }
 }

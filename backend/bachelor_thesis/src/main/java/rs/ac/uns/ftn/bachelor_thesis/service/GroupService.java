@@ -96,8 +96,10 @@ public class GroupService {
         return groupsDTO;
     }
 
-    public Optional<Group> getGroupById(Long id) {
-        return groupRepository.findById(id);
+    public Group getGroupById(Long id) {
+        return groupRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Group with an id %d doesn't exist!", id))
+        );
     }
 
     public GroupDTO getGroupDtoById(Long id) {
