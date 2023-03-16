@@ -45,23 +45,24 @@ public class AppointmentDTO {
         this.groupId = appointment.getGroup().getId();
         this.groupName = appointment.getGroup().getName();
 
-        appointment.getPlayers().forEach(player -> {
-            this.playersEmails.add(player.getEmail());
-        });
+        if (appointment.getPlayers() != null)
+            appointment.getPlayers().forEach(player -> this.playersEmails.add(player.getEmail()));
 
-        int goalsByTeamRed, goalsByTeamBlue;
-        for (Game game : appointment.getGames()) {
-            goalsByTeamRed = 0;
-            goalsByTeamBlue = 0;
+        if (appointment.getGames() != null) {
+            int goalsByTeamRed, goalsByTeamBlue;
+            for (Game game : appointment.getGames()) {
+                goalsByTeamRed = 0;
+                goalsByTeamBlue = 0;
 
-            for (Goal goal : game.getGoals()) {
-                if (goal.getTeamColor().equals(TeamColor.BLUE))
-                    ++goalsByTeamBlue;
-                else if (goal.getTeamColor().equals(TeamColor.RED))
-                    ++goalsByTeamRed;
+                for (Goal goal : game.getGoals()) {
+                    if (goal.getTeamColor().equals(TeamColor.BLUE))
+                        ++goalsByTeamBlue;
+                    else if (goal.getTeamColor().equals(TeamColor.RED))
+                        ++goalsByTeamRed;
+                }
+
+                this.games.add(new GameBasicInfoDTO(game.getId(), goalsByTeamRed, goalsByTeamBlue));
             }
-
-            this.games.add(new GameBasicInfoDTO(game.getId(), goalsByTeamRed, goalsByTeamBlue));
         }
     }
 }
