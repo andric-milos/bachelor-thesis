@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import rs.ac.uns.ftn.bachelor_thesis.dto.GameDTO;
 import rs.ac.uns.ftn.bachelor_thesis.service.GameService;
 
 @RestController
@@ -18,7 +19,7 @@ public class GameController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getGameById(@PathVariable("id") Long gameId) {
+    public ResponseEntity<GameDTO> getGameById(@PathVariable("id") Long gameId) {
         return new ResponseEntity<>(gameService.getGameById(gameId), HttpStatus.OK);
     }
 }

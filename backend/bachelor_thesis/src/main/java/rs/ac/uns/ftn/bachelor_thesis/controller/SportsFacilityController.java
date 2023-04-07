@@ -9,6 +9,8 @@ import rs.ac.uns.ftn.bachelor_thesis.service.ManagerService;
 import rs.ac.uns.ftn.bachelor_thesis.service.SportsFacilityService;
 import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/sportsFacility")
 public class SportsFacilityController {
@@ -26,12 +28,12 @@ public class SportsFacilityController {
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_MANAGER')")
-    public ResponseEntity<?> createSportsFacility(@RequestBody SportsFacilityDTO dto) {
+    public ResponseEntity<SportsFacilityDTO> createSportsFacility(@RequestBody SportsFacilityDTO dto) {
         return new ResponseEntity<>(sportsFacilityService.createSportsFacility(dto), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllSportsFacilities() {
+    public ResponseEntity<List<SportsFacilityDTO>> getAllSportsFacilities() {
         return new ResponseEntity<>(sportsFacilityService.getAllSportsFacilities(), HttpStatus.OK);
     }
 }

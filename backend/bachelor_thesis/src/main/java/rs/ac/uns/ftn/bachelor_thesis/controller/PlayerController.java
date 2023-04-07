@@ -6,7 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import rs.ac.uns.ftn.bachelor_thesis.dto.PlayerDTO;
+import rs.ac.uns.ftn.bachelor_thesis.dto.PlayerWithStatisticsDTO;
 import rs.ac.uns.ftn.bachelor_thesis.service.PlayerService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/player")
@@ -18,17 +22,17 @@ public class PlayerController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllPlayers() {
+    public ResponseEntity<List<PlayerDTO>> getAllPlayers() {
         return new ResponseEntity<>(playerService.getAllPlayers(), HttpStatus.OK);
     }
 
     @GetMapping("/email/{email}")
-    public ResponseEntity<?> getPlayerByEmail(@PathVariable String email) {
+    public ResponseEntity<PlayerWithStatisticsDTO> getPlayerByEmail(@PathVariable String email) {
         return new ResponseEntity<>(playerService.getPlayerDtoByEmail(email), HttpStatus.OK);
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<?> getPlayerById(@PathVariable Long id) {
+    public ResponseEntity<PlayerDTO> getPlayerById(@PathVariable Long id) {
         return new ResponseEntity<>(playerService.getPlayerDtoById(id), HttpStatus.OK);
     }
 }
