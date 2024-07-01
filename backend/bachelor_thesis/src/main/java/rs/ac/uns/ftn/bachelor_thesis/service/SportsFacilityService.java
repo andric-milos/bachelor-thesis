@@ -40,8 +40,12 @@ public class SportsFacilityService {
             throw new InvalidInputDataException("Invalid input of data!");
 
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Manager manager = managerService.getManagerByEmail(email)
-                .orElseThrow(() -> new UnauthorizedException("You're not authorized to perform this action!"));
+        Manager manager;
+        try {
+            manager = managerService.getManagerByEmail(email);
+        } catch (Exception e) {
+            throw new UnauthorizedException("You're not authorized to perform this action!");
+        }
 
         if (manager.getSportsFacility() != null)
             throw new CustomizableBadRequestException("You've already added a sports facility!");
