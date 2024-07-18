@@ -14,18 +14,22 @@ public class SportsFacilityDTO {
     private Long id;
     private LocationDTO location;
     private String name;
-    private double pricePerHour;
+    private Double pricePerHour;
     private String managerEmail;
     private String managerFirstName;
     private String managerLastName;
 
     public SportsFacilityDTO(SportsFacility sportsFacility) {
-        this.id = sportsFacility.getId();
-        this.location = new LocationDTO(sportsFacility.getLocation());
-        this.name = sportsFacility.getName();
-        this.pricePerHour = sportsFacility.getPricePerHour();
-        this.managerEmail = sportsFacility.getManager().getEmail();
-        this.managerFirstName = sportsFacility.getManager().getFirstName();
-        this.managerLastName = sportsFacility.getManager().getLastName();
+        if (sportsFacility != null) {
+            this.id = sportsFacility.getId();
+            this.location = sportsFacility.getLocation() != null ? new LocationDTO(sportsFacility.getLocation()) : null;
+            this.name = sportsFacility.getName();
+            this.pricePerHour = sportsFacility.getPricePerHour();
+            if (sportsFacility.getManager() != null) {
+                this.managerEmail = sportsFacility.getManager().getEmail();
+                this.managerFirstName = sportsFacility.getManager().getFirstName();
+                this.managerLastName = sportsFacility.getManager().getLastName();
+            }
+        }
     }
 }

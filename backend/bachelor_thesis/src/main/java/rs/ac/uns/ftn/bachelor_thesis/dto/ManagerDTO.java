@@ -1,13 +1,13 @@
 package rs.ac.uns.ftn.bachelor_thesis.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import rs.ac.uns.ftn.bachelor_thesis.model.Manager;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class ManagerDTO {
     private Long id;
     private String firstName;
@@ -22,9 +22,6 @@ public class ManagerDTO {
         this.lastName = manager.getLastName();
         this.email = manager.getEmail();
         this.telephone = manager.getTelephone();
-        if (manager.getSportsFacility() != null)
-            this.sportsFacility = new SportsFacilityDTO(manager.getSportsFacility());
-        else
-            this.sportsFacility = null;
+        this.sportsFacility = manager.getSportsFacility() != null ? new SportsFacilityDTO(manager.getSportsFacility()) : null;
     }
 }

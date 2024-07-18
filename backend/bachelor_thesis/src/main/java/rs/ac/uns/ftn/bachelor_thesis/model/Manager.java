@@ -1,6 +1,7 @@
 package rs.ac.uns.ftn.bachelor_thesis.model;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
+@SuperBuilder
 public class Manager extends User {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "sports_facility_id")

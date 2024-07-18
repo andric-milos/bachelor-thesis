@@ -65,7 +65,7 @@ public class AppointmentService {
                 group,
                 new Date(dto.getDate()),
                 AppointmentPrivacy.valueOf(dto.getPrivacy().toUpperCase()),
-                new Location(dto.getAddress(), 0.0, 0.0),
+                new Location(dto.getAddress(), null, null), // Because locations (longitude & latitude) selected from maps are not implemented yet
                 dto.getCapacity(),
                 dto.getPrice()
         );

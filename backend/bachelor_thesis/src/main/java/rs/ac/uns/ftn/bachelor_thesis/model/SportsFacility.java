@@ -26,7 +26,7 @@ public class SportsFacility {
     private Manager manager;
 
     private String name;
-    private double pricePerHour; // In RSD.
+    private Double pricePerHour; // In RSD.
 
     @OneToMany(mappedBy = "sportsFacility")
     private Set<SportsFacilityComment> comments;

@@ -13,13 +13,15 @@ import rs.ac.uns.ftn.bachelor_thesis.model.Location;
 public class LocationDTO {
     private Long id;
     private String address;
-    private double longitude;
-    private double latitude;
+    private Double longitude;
+    private Double latitude;
 
     public LocationDTO(Location location) {
-        this.id = location.getId();
-        this.address = location.getAddress();
-        this.longitude = location.getLongitude();
-        this.latitude = location.getLatitude();
+        if (location != null) {
+            this.id = location.getId();
+            this.address = location.getAddress();
+            this.longitude = location.getLongitude();
+            this.latitude = location.getLatitude();
+        }
     }
 }
