@@ -6,13 +6,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.exception.InternalServerErrorException;
-import rs.ac.uns.ftn.bachelor_thesis.exception.ManagerNotFoundException;
+import rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException;
 import rs.ac.uns.ftn.bachelor_thesis.model.Manager;
 import rs.ac.uns.ftn.bachelor_thesis.model.Role;
 import rs.ac.uns.ftn.bachelor_thesis.repository.ManagerRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.RoleRepository;
 
-import java.util.Optional;
+import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.MANAGER_EMAIL;
 
 @Slf4j
 @Service
@@ -53,6 +53,6 @@ public class ManagerService {
     }
 
     public Manager getManagerByEmail(String email) {
-        return managerRepository.findByEmail(email).orElseThrow(() -> new ManagerNotFoundException(email));
+        return managerRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException(MANAGER_EMAIL, email));
     }
 }

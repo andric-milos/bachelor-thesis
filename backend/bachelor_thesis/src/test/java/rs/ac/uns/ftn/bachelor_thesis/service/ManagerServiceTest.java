@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import rs.ac.uns.ftn.bachelor_thesis.exception.ManagerNotFoundException;
+import rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException;
 import rs.ac.uns.ftn.bachelor_thesis.model.Manager;
 import rs.ac.uns.ftn.bachelor_thesis.repository.ManagerRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.RoleRepository;
@@ -49,7 +49,7 @@ class ManagerServiceTest {
         }
 
         @Test
-        void shouldThrowManagerNotFoundException() {
+        void shouldThrowResourceNotFoundException() {
             // Arrange
             String email = "email@email.com";
             when(managerRepository.findByEmail(email)).thenReturn(Optional.empty());
@@ -58,7 +58,7 @@ class ManagerServiceTest {
             Executable executable = () -> managerService.getManagerByEmail(email);
 
             // Assert
-            assertThrows(ManagerNotFoundException.class, executable);
+            assertThrows(ResourceNotFoundException.class, executable);
             verify(managerRepository, times(1)).findByEmail(email);
         }
     }

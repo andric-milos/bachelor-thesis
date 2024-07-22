@@ -13,11 +13,6 @@ public class RestResponseEntityExceptionResolver {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(ManagerNotFoundException.class)
-    public ResponseEntity<?> resolveManagerNotFoundException(ManagerNotFoundException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
     @ExceptionHandler(InvalidInputDataException.class)
     public ResponseEntity<?> resolveInvalidDataException(InvalidInputDataException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
