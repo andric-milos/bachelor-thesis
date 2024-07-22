@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.PLAYER_EMAIL;
+import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.PLAYER_ID;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -47,7 +50,7 @@ public class PlayerService {
 
     public PlayerWithStatisticsDTO getPlayerDtoByEmail(String email) {
         Player player = playerRepository.findByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Player with an email %s doesn't exist!", email))
+                () -> new ResourceNotFoundException(PLAYER_EMAIL, email)
         );
 
         return new PlayerWithStatisticsDTO(player);
@@ -55,7 +58,7 @@ public class PlayerService {
 
     public PlayerDTO getPlayerDtoById(Long id) {
         Player player = playerRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Player with an id %d doesn't exist!", id))
+                () -> new ResourceNotFoundException(PLAYER_ID, String.valueOf(id))
         );
 
         return new PlayerDTO(player);

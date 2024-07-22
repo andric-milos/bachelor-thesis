@@ -12,6 +12,8 @@ import rs.ac.uns.ftn.bachelor_thesis.repository.GameRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.GAME_ID;
+
 @Service
 public class GameService {
     private GameRepository gameRepository;
@@ -22,7 +24,7 @@ public class GameService {
 
     public GameDTO getGameById(Long id) {
         Game game = gameRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Game with an id %d does not exist!", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(GAME_ID, String.valueOf(id)));
 
         List<GoalWithPlayerInfoDTO> goals = new ArrayList<>();
         game.getGoals().forEach(goal -> {

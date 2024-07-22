@@ -22,17 +22,17 @@ class PlayerServiceTest {
 
     @Test
     void getPlayerByEmail_shouldReturnExistingPlayer() {
+        // Arrange
         String email = "test@gmail.com";
         Player player = new Player();
         player.setEmail(email);
 
         Mockito.when(playerRepository.findByEmail(email)).thenReturn(Optional.of(player));
 
+        // Act
         Optional<Player> returnedPlayer = playerService.getPlayerByEmail(email);
 
-        System.out.println(player.getEmail());
-        System.out.println(returnedPlayer.get().getEmail());
-
+        // Assert
         assertEquals(returnedPlayer.get().getEmail(), email);
     }
 }

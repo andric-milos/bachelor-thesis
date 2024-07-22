@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.GROUP_ID;
+
 @Service
 public class GroupService {
     private final GroupRepository groupRepository;
@@ -98,13 +100,13 @@ public class GroupService {
 
     public Group getGroupById(Long id) {
         return groupRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Group with an id %d doesn't exist!", id))
+                () -> new ResourceNotFoundException(GROUP_ID, String.valueOf(id))
         );
     }
 
     public GroupDTO getGroupDtoById(Long id) {
         Group group = groupRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Group with an id %d does not exist!", id))
+                () -> new ResourceNotFoundException(GROUP_ID, String.valueOf(id))
         );
 
         String loggedInUsersEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

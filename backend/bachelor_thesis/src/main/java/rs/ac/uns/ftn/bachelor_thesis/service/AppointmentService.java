@@ -20,6 +20,9 @@ import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.APPOINTMENT_ID;
+import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.PLAYER_EMAIL;
+
 @Service
 public class AppointmentService {
     private AppointmentRepository appointmentRepository;
@@ -75,7 +78,7 @@ public class AppointmentService {
 
     public AppointmentDTO getAppointmentById(Long id) {
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Appointment with an id %d doesn't exist!", id))
+                () -> new ResourceNotFoundException(APPOINTMENT_ID, String.valueOf(id))
         );
 
         /* Checking if the player has access to this data. */
@@ -116,7 +119,7 @@ public class AppointmentService {
             throw new InvalidInputDataException("Invalid input of data!");
 
         Appointment appointment = appointmentRepository.findById(dto.getAppointmentId()).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Appointment with an id %d doesn't exist!", dto.getAppointmentId()))
+                () -> new ResourceNotFoundException(APPOINTMENT_ID, String.valueOf(dto.getAppointmentId()))
         );
 
         if (!playerService.doPlayersExist(Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).toList()))
@@ -256,7 +259,7 @@ public class AppointmentService {
 
     public AppointmentDTO attendAppointment(Long id) {
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Appointment with an id %d doesn't exist!", id))
+                () -> new ResourceNotFoundException(APPOINTMENT_ID, String.valueOf(id))
         );
 
         /* Checking if the player can attend this appointment. */
@@ -269,7 +272,7 @@ public class AppointmentService {
             throw new CustomizableBadRequestException("Full capacity!");
 
         Player player = playerService.getPlayerByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Player with an email %s not found!", email))
+                () -> new ResourceNotFoundException(PLAYER_EMAIL, email)
         );
 
         return new AppointmentDTO(addPlayerToAppointment(appointment, player));
@@ -277,12 +280,12 @@ public class AppointmentService {
 
     public AppointmentDTO cancelAppointment(Long id) {
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Appointment with an id %d doesn't exist!", id))
+                () -> new ResourceNotFoundException(APPOINTMENT_ID, String.valueOf(id))
         );
 
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Player player = playerService.getPlayerByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Player with an email %s not found!", email))
+                () -> new ResourceNotFoundException(PLAYER_EMAIL, email)
         );
 
         return new AppointmentDTO(removePlayerFromAppointment(appointment, player));
@@ -290,7 +293,7 @@ public class AppointmentService {
 
     public boolean amIattending(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("Appointment with an id %d doesn't exist!", appointmentId))
+                () -> new ResourceNotFoundException(APPOINTMENT_ID, String.valueOf(appointmentId))
         );
 
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
