@@ -16,7 +16,6 @@ import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.GROUP_ID;
@@ -46,9 +45,11 @@ public class GroupService {
      */
     public boolean areAllPlayersExisting(Set<String> playersEmails) {
         for (String email : playersEmails) {
-            Optional<Player> player = playerService.getPlayerByEmail(email);
-            if (player.isEmpty())
+            try {
+                playerService.getPlayerByEmail(email);
+            } catch (Exception e) {
                 return false;
+            }
         }
 
         return true;
@@ -62,15 +63,23 @@ public class GroupService {
             throw new CustomizableBadRequestException("You selected one or more non-existing players!");
 
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Player creatorOfTheGroup = playerService.getPlayerByEmail(email)
-                .orElseThrow(() -> new UnauthorizedException("Not logged in!"));
+        Player creatorOfTheGroup;
+        try {
+            creatorOfTheGroup = playerService.getPlayerByEmail(email);
+        } catch (Exception e) {
+            throw new UnauthorizedException("Not logged in!");
+        }
 
         Group group = new Group();
         group.setName(dto.getName());
 
         dto.getPlayersEmails().forEach(playerEmail -> {
-            Optional<Player> player = playerService.getPlayerByEmail(playerEmail);
-            player.ifPresent(value -> group.getPlayers().add(value));
+            try {
+                Player player = playerService.getPlayerByEmail(playerEmail);
+                group.getPlayers().add(player);
+            } catch (Exception e) {
+                // do nothing
+            }
         });
 
         group.getPlayers().add(creatorOfTheGroup);

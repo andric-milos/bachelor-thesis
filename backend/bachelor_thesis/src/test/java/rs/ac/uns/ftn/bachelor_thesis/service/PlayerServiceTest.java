@@ -30,9 +30,9 @@ class PlayerServiceTest {
         Mockito.when(playerRepository.findByEmail(email)).thenReturn(Optional.of(player));
 
         // Act
-        Optional<Player> returnedPlayer = playerService.getPlayerByEmail(email);
+        Player returnedPlayer = playerService.getPlayerByEmail(email);
 
         // Assert
-        assertEquals(returnedPlayer.get().getEmail(), email);
+        assertEquals(returnedPlayer.getEmail(), email);
     }
 }

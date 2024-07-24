@@ -40,8 +40,8 @@ public class PlayerService {
         return playersDto;
     }
 
-    public Optional<Player> getPlayerByEmail(String email) {
-        return playerRepository.findByEmail(email);
+    public Player getPlayerByEmail(String email) {
+        return playerRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException(PLAYER_EMAIL, email));
     }
 
     public Optional<Player> getPlayerById(Long id) {
@@ -101,9 +101,11 @@ public class PlayerService {
      */
     public boolean doPlayersExist(List<String> playersEmails) {
         for (String email : playersEmails) {
-            Optional<Player> player = getPlayerByEmail(email);
-            if (player.isEmpty())
+            try {
+                getPlayerByEmail(email);
+            } catch (Exception e) {
                 return false;
+            }
         }
 
         return true;

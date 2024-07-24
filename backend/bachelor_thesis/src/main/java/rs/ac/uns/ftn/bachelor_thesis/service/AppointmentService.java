@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.APPOINTMENT_ID;
-import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.PLAYER_EMAIL;
 
 @Service
 public class AppointmentService {
@@ -56,9 +55,12 @@ public class AppointmentService {
         Group group = groupService.getGroupById(dto.getGroupId());
 
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Player player = playerService.getPlayerByEmail(email).orElseThrow(
-                () -> new UnauthorizedException("Unauthorized!")
-        );
+        Player player;
+        try {
+            player = playerService.getPlayerByEmail(email);
+        } catch (Exception e) {
+            throw new UnauthorizedException("Unauthorized!");
+        }
 
         if (!group.getPlayers().contains(player))
             throw new UnauthorizedException("You're not in the group!");
@@ -126,9 +128,12 @@ public class AppointmentService {
             throw new CustomizableBadRequestException("You entered one or more non-existing players!");
 
         String loggedInPlayersEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Player loggedInPlayer = playerService.getPlayerByEmail(loggedInPlayersEmail).orElseThrow(
-                () -> new UnauthorizedException("Unauthorized")
-        );
+        Player loggedInPlayer;
+        try {
+            loggedInPlayer = playerService.getPlayerByEmail(loggedInPlayersEmail);
+        } catch (Exception e) {
+            throw new UnauthorizedException("Unauthorized");
+        }
 
         if (!appointment.getPlayers().contains(loggedInPlayer))
             throw new UnauthorizedException("You are not an attendee of this appointment!");
@@ -138,7 +143,7 @@ public class AppointmentService {
             /* Getting each player by his email and adding him to the Set of players,
              * which will later be used to form a Team (teamRed) and that Team
              * will then be added to the Game which will be saved in the database. */
-            Player player = playerService.getPlayerByEmail(email).get();
+            Player player = playerService.getPlayerByEmail(email);
             teamRedPlayers.add(player);
 
             // Updating each player's number of games and saving it to the database.
@@ -151,7 +156,7 @@ public class AppointmentService {
             /* Getting each player by his email and adding him to the Set of players,
              * which will later be used to form a Team (teamBlue) and that Team
              * will then be added to the Game which will be saved in the database. */
-            Player player = playerService.getPlayerByEmail(email).get();
+            Player player = playerService.getPlayerByEmail(email);
             teamBluePlayers.add(player);
 
             // Updating each player's number of games and saving it to the database.
@@ -172,7 +177,7 @@ public class AppointmentService {
              * a new Goal: player, teamColor, game. Then we add that Goal to a List
              * of goals which will later be used to associate them with the game
              * and save all of that in the database. */
-            Player player = playerService.getPlayerByEmail(goalDTO.getPlayer()).get();
+            Player player = playerService.getPlayerByEmail(goalDTO.getPlayer());
             Goal goal = Goal.builder()
                     .player(player)
                     .teamColor(TeamColor.valueOf(goalDTO.getTeamColor().toUpperCase()))
@@ -271,9 +276,7 @@ public class AppointmentService {
         if (appointment.getOccupancy() >= appointment.getCapacity())
             throw new CustomizableBadRequestException("Full capacity!");
 
-        Player player = playerService.getPlayerByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException(PLAYER_EMAIL, email)
-        );
+        Player player = playerService.getPlayerByEmail(email);
 
         return new AppointmentDTO(addPlayerToAppointment(appointment, player));
     }
@@ -284,9 +287,7 @@ public class AppointmentService {
         );
 
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Player player = playerService.getPlayerByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException(PLAYER_EMAIL, email)
-        );
+        Player player = playerService.getPlayerByEmail(email);
 
         return new AppointmentDTO(removePlayerFromAppointment(appointment, player));
     }
