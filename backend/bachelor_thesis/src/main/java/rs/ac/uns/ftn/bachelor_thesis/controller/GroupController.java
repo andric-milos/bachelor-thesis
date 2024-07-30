@@ -13,7 +13,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/group")
 public class GroupController {
-    private GroupService groupService;
+    private final GroupService groupService;
 
     public GroupController(GroupService groupService) {
         this.groupService = groupService;

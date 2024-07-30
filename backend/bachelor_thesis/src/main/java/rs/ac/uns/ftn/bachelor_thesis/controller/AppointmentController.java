@@ -13,7 +13,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/appointment")
 public class AppointmentController {
-    private AppointmentService appointmentService;
+    private final AppointmentService appointmentService;
 
     public AppointmentController(AppointmentService appointmentService) {
         this.appointmentService = appointmentService;

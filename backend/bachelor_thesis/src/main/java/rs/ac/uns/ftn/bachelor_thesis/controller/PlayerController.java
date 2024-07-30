@@ -15,11 +15,14 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/player")
 public class PlayerController {
-    private PlayerService playerService;
+    private final PlayerService playerService;
 
     public PlayerController(PlayerService playerService) {
         this.playerService = playerService;
     }
+
+    // See on what of these endpoints there should be a @PreAuthorize
+    // Then also modify integration test to work with authorization
 
     @GetMapping
     public ResponseEntity<List<PlayerDTO>> getAllPlayers() {

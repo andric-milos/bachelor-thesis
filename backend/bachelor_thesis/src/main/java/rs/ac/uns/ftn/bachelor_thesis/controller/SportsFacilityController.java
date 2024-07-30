@@ -14,9 +14,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/sportsFacility")
 public class SportsFacilityController {
-    private SportsFacilityService sportsFacilityService;
-    private ValidationUtil validationUtil;
-    private ManagerService managerService;
+    private final SportsFacilityService sportsFacilityService;
+    private final ValidationUtil validationUtil;
+    private final ManagerService managerService;
 
     public SportsFacilityController(SportsFacilityService sportsFacilityService,
                                     ValidationUtil validationUtil,

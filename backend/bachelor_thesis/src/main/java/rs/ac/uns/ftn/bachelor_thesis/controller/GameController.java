@@ -12,7 +12,7 @@ import rs.ac.uns.ftn.bachelor_thesis.service.GameService;
 @RestController
 @RequestMapping(value = "/game")
 public class GameController {
-    private GameService gameService;
+    private final GameService gameService;
 
     public GameController(GameService gameService) {
         this.gameService = gameService;
