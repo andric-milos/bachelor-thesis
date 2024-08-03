@@ -15,12 +15,13 @@ import rs.ac.uns.ftn.bachelor_thesis.model.*;
 import rs.ac.uns.ftn.bachelor_thesis.repository.AppointmentRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.GameRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.PlayerRepository;
-import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
 import java.util.*;
 import java.util.stream.Stream;
 
 import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.APPOINTMENT_ID;
+import static rs.ac.uns.ftn.bachelor_thesis.util.ValidationUtil.validateCreateGameDTO;
+import static rs.ac.uns.ftn.bachelor_thesis.util.ValidationUtil.validateNewAppointmentDTO;
 
 @Service
 public class AppointmentService {
@@ -30,26 +31,23 @@ public class AppointmentService {
     private GameRepository gameRepository;
     private PlayerRepository playerRepository;
     private AppointmentMapper appointmentMapper;
-    private ValidationUtil validationUtil;
 
     public AppointmentService(AppointmentRepository appointmentRepository,
                               GroupService groupService,
                               PlayerService playerService,
                               GameRepository gameRepository,
                               PlayerRepository playerRepository,
-                              AppointmentMapper appointmentMapper,
-                              ValidationUtil validationUtil) {
+                              AppointmentMapper appointmentMapper) {
         this.appointmentRepository = appointmentRepository;
         this.groupService = groupService;
         this.playerService = playerService;
         this.gameRepository = gameRepository;
         this.playerRepository = playerRepository;
         this.appointmentMapper = appointmentMapper;
-        this.validationUtil = validationUtil;
     }
 
     public AppointmentDTO createAppointment(NewAppointmentDTO dto) {
-        if (!validationUtil.validateNewAppointmentDTO(dto))
+        if (!validateNewAppointmentDTO(dto))
             throw new InvalidInputDataException("Invalid input of data!");
 
         Group group = groupService.getGroupById(dto.getGroupId());
@@ -117,7 +115,7 @@ public class AppointmentService {
 
     @Transactional
     public GameBasicInfoDTO addGame(CreateGameDTO dto) {
-        if (!validationUtil.validateCreateGameDTO(dto))
+        if (!validateCreateGameDTO(dto))
             throw new InvalidInputDataException("Invalid input of data!");
 
         Appointment appointment = appointmentRepository.findById(dto.getAppointmentId()).orElseThrow(

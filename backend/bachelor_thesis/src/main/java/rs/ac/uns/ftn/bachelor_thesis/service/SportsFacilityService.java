@@ -11,32 +11,30 @@ import rs.ac.uns.ftn.bachelor_thesis.model.Manager;
 import rs.ac.uns.ftn.bachelor_thesis.model.SportsFacility;
 import rs.ac.uns.ftn.bachelor_thesis.repository.ManagerRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.SportsFacilityRepository;
-import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static rs.ac.uns.ftn.bachelor_thesis.util.ValidationUtil.validateSportsFacilityDTO;
 
 @Service
 public class SportsFacilityService {
     private ManagerRepository managerRepository;
     private SportsFacilityRepository sportsFacilityRepository;
-    private ValidationUtil validationUtil;
     private ManagerService managerService;
 
     public SportsFacilityService(ManagerRepository managerRepository,
                                  SportsFacilityRepository sportsFacilityRepository,
-                                 ValidationUtil validationUtil,
                                  ManagerService managerService) {
         this.managerRepository = managerRepository;
         this.sportsFacilityRepository = sportsFacilityRepository;
-        this.validationUtil = validationUtil;
         this.managerService = managerService;
     }
 
     public SportsFacilityDTO createSportsFacility(SportsFacilityDTO dto) {
         // Manager needs to pass an object which contains following fields: location, name, pricePerHour.
 
-        if (!validationUtil.validateSportsFacilityDTO(dto))
+        if (!validateSportsFacilityDTO(dto))
             throw new InvalidInputDataException("Invalid input of data!");
 
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

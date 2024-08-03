@@ -1,4 +1,4 @@
-package rs.ac.uns.ftn.bachelor_thesis.validation;
+package rs.ac.uns.ftn.bachelor_thesis.util;
 
 import rs.ac.uns.ftn.bachelor_thesis.dto.*;
 import rs.ac.uns.ftn.bachelor_thesis.enumeration.AppointmentPrivacy;
@@ -27,6 +27,9 @@ public class ValidationUtil {
             + "[^-.][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     private static final String TELEPHONE_PATTERN = "06\\d{7,8}";
 
+    private ValidationUtil() {
+    }
+
     /**
      * Trims and validates the RegisterInfoDTO object passed as an argument.
      *
@@ -34,8 +37,20 @@ public class ValidationUtil {
      * @return null, if the validation wasn't successful. Trimmed RegisterInfoDTO object
      * if validation was successful.
      */
-    public RegisterInfoDTO trimAndValidateRegisterInfo(RegisterInfoDTO dto) {
+    public static RegisterInfoDTO trimAndValidateRegisterInfo(RegisterInfoDTO dto) {
         if (dto == null) {
+            return null;
+        }
+
+        if (dto.getFirstName() == null || dto.getFirstName().trim().isEmpty()) {
+            return null;
+        } else if (dto.getLastName() == null || dto.getLastName().trim().isEmpty()) {
+            return null;
+        } else if (dto.getEmail() == null || dto.getEmail().trim().isEmpty()) {
+            return null;
+        } else if (dto.getTelephone() == null || dto.getTelephone().trim().isEmpty()) {
+            return null;
+        } else if (dto.getRole() == null || dto.getRole().trim().isEmpty()) {
             return null;
         }
 
@@ -44,18 +59,6 @@ public class ValidationUtil {
         dto.setEmail(dto.getEmail().trim());
         dto.setTelephone(dto.getTelephone().trim());
         dto.setRole(dto.getRole().trim());
-
-        if (dto.getFirstName().equals("") || dto.getFirstName() == null) {
-            return null;
-        } else if (dto.getLastName().equals("") || dto.getLastName() == null) {
-            return null;
-        } else if (dto.getEmail().equals("") || dto.getEmail() == null) {
-            return null;
-        } else if (dto.getTelephone().equals("") || dto.getTelephone() == null) {
-            return null;
-        } else if (dto.getRole().equals("") || dto.getRole() == null) {
-            return null;
-        }
 
         if (!Pattern.compile(EMAIL_REGEX_PATTERN).matcher(dto.getEmail()).matches()) {
             return null;
@@ -75,13 +78,15 @@ public class ValidationUtil {
      * @param dto
      * @return false, if the CreateGroupDTO object is not valid, true if it is valid.
      */
-    public boolean validateCreateGroupDTO(CreateGroupDTO dto) {
-        if (dto.getName() == null || dto.getName().equals(""))
+    public static boolean validateCreateGroupDTO(CreateGroupDTO dto) {
+        if (dto.getName() == null || dto.getName().isEmpty()) {
             return false;
+        }
 
         for (String email : dto.getPlayersEmails()) {
-            if (!Pattern.compile(EMAIL_REGEX_PATTERN).matcher(email).matches())
+            if (!Pattern.compile(EMAIL_REGEX_PATTERN).matcher(email).matches()) {
                 return false;
+            }
         }
 
         return true;
@@ -93,7 +98,9 @@ public class ValidationUtil {
      * @param dto
      * @return true, if the received NewAppointmentDTO object is valid; false if it isn't.
      */
-    public boolean validateNewAppointmentDTO(NewAppointmentDTO dto) {
+    public static boolean validateNewAppointmentDTO(NewAppointmentDTO dto) {
+        // Add a check for groupId?
+
         /* This check is maybe redundant, because Java, when mapping fields passed within
          * Request Body object, automatically checks if they fit the right format? */
         try {
@@ -102,8 +109,9 @@ public class ValidationUtil {
             return false;
         }
 
-        if (dto.getAddress() == null || dto.getAddress().equals(""))
+        if (dto.getAddress() == null || dto.getAddress().isEmpty()) {
             return false;
+        }
 
         try {
             AppointmentPrivacy.valueOf(dto.getPrivacy().toUpperCase());
@@ -131,16 +139,19 @@ public class ValidationUtil {
      * @param dto
      * @return true, if the received object is valid, false if it is not.
      */
-    public boolean validateCreateGameDTO(CreateGameDTO dto) {
-        if (dto.getAppointmentId() == null)
+    public static boolean validateCreateGameDTO(CreateGameDTO dto) {
+        if (dto.getAppointmentId() == null) {
             return false;
+        }
 
-        if (dto.getTeamRed().isEmpty() || dto.getTeamBlue().isEmpty())
+        if (dto.getTeamRed().isEmpty() || dto.getTeamBlue().isEmpty()) {
             return false;
+        }
 
         if (Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).distinct().count() <
-            Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).count())
+            Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).count()) {
             return false;
+        }
 
         for (String email : Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).toList()) {
             if (!Pattern.compile(EMAIL_REGEX_PATTERN).matcher(email).matches())
@@ -165,15 +176,18 @@ public class ValidationUtil {
         return true;
     }
 
-    public boolean validateSportsFacilityDTO(SportsFacilityDTO dto) {
-        if (dto.getLocation().getAddress() == null || dto.getLocation().getAddress().equals(""))
+    public static boolean validateSportsFacilityDTO(SportsFacilityDTO dto) {
+        if (dto.getLocation().getAddress() == null || dto.getLocation().getAddress().isEmpty()) {
             return false;
+        }
 
-        if (dto.getName() == null || dto.getName().equals(""))
+        if (dto.getName() == null || dto.getName().isEmpty()) {
             return false;
+        }
 
-        if (dto.getPricePerHour() < 0.0)
+        if (dto.getPricePerHour() < 0.0) {
             return false;
+        }
 
         return true;
     }

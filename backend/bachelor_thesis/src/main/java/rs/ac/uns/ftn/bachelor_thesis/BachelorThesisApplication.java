@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import rs.ac.uns.ftn.bachelor_thesis.security.CustomCorsFilter;
 import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
-import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
+import rs.ac.uns.ftn.bachelor_thesis.util.ValidationUtil;
 
 @SpringBootApplication
 public class BachelorThesisApplication {
@@ -25,11 +25,6 @@ public class BachelorThesisApplication {
 	@Bean
 	TokenUtil tokenUtil() {
 		return new TokenUtil();
-	}
-
-	@Bean
-	ValidationUtil validationUtil() {
-		return new ValidationUtil();
 	}
 
 	@Bean

@@ -5,9 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.bachelor_thesis.dto.SportsFacilityDTO;
-import rs.ac.uns.ftn.bachelor_thesis.service.ManagerService;
 import rs.ac.uns.ftn.bachelor_thesis.service.SportsFacilityService;
-import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
 import java.util.List;
 
@@ -15,15 +13,9 @@ import java.util.List;
 @RequestMapping("/sportsFacility")
 public class SportsFacilityController {
     private final SportsFacilityService sportsFacilityService;
-    private final ValidationUtil validationUtil;
-    private final ManagerService managerService;
 
-    public SportsFacilityController(SportsFacilityService sportsFacilityService,
-                                    ValidationUtil validationUtil,
-                                    ManagerService managerService) {
+    public SportsFacilityController(SportsFacilityService sportsFacilityService) {
         this.sportsFacilityService = sportsFacilityService;
-        this.validationUtil = validationUtil;
-        this.managerService = managerService;
     }
 
     @PostMapping

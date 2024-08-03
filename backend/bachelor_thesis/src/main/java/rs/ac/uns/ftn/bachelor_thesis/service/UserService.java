@@ -20,10 +20,11 @@ import rs.ac.uns.ftn.bachelor_thesis.model.User;
 import rs.ac.uns.ftn.bachelor_thesis.repository.RoleRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.UserRepository;
 import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
-import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static rs.ac.uns.ftn.bachelor_thesis.util.ValidationUtil.trimAndValidateRegisterInfo;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +34,6 @@ public class UserService{
     private final RoleRepository roleRepository;
     private final TokenUtil tokenUtil;
     private final AuthenticationManager authenticationManager;
-    private final ValidationUtil validationUtil;
     private final PlayerService playerService;
     private final ManagerService managerService;
 
@@ -116,13 +116,16 @@ public class UserService{
     }
 
     public UserDTO register(RegisterInfoDTO dto) {
-        dto = validationUtil.trimAndValidateRegisterInfo(dto);
+        dto = trimAndValidateRegisterInfo(dto);
 
-        if (dto == null) throw new CustomizableBadRequestException("Invalid input of data!");
+        if (dto == null) {
+            throw new CustomizableBadRequestException("Invalid input of data!");
+        }
 
         String email = dto.getEmail();
-        if (userRepository.findByEmail(email).isPresent())
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new CustomizableBadRequestException(String.format("Email %s is already taken!", email));
+        }
 
         // Role whitelisted values: "manager", "player"
         String role = dto.getRole();

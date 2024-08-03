@@ -21,7 +21,7 @@ public class Appointment {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    private Date date; // Date and time.
+    private Date date; // Date and time -> MODIFY THIS AND THE REST OF THE CODE TO WORK WITH THE LocalDate
     private AppointmentPrivacy privacy;
     private int capacity; // The number of maximum players at the appointment.
     private int occupancy; // Calculated: (set of players).length

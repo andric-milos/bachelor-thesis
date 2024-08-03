@@ -12,28 +12,25 @@ import rs.ac.uns.ftn.bachelor_thesis.mapper.GroupMapper;
 import rs.ac.uns.ftn.bachelor_thesis.model.Group;
 import rs.ac.uns.ftn.bachelor_thesis.model.Player;
 import rs.ac.uns.ftn.bachelor_thesis.repository.GroupRepository;
-import rs.ac.uns.ftn.bachelor_thesis.validation.ValidationUtil;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.GROUP_ID;
+import static rs.ac.uns.ftn.bachelor_thesis.util.ValidationUtil.validateCreateGroupDTO;
 
 @Service
 public class GroupService {
     private final GroupRepository groupRepository;
     private final PlayerService playerService;
-    private final ValidationUtil validationUtil;
     private final GroupMapper groupMapper;
 
     public GroupService(GroupRepository groupRepository,
                         PlayerService playerService,
-                        ValidationUtil validationUtil,
                         GroupMapper groupMapper) {
         this.groupRepository = groupRepository;
         this.playerService = playerService;
-        this.validationUtil = validationUtil;
         this.groupMapper = groupMapper;
     }
 
@@ -56,7 +53,7 @@ public class GroupService {
     }
 
     public GroupDTO createGroup(CreateGroupDTO dto) {
-        if (!validationUtil.validateCreateGroupDTO(dto))
+        if (!validateCreateGroupDTO(dto))
             throw new InvalidInputDataException("Invalid input of data!");
 
         if (!areAllPlayersExisting(dto.getPlayersEmails()))
