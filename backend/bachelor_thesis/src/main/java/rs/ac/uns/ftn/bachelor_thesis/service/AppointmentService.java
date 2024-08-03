@@ -25,12 +25,12 @@ import static rs.ac.uns.ftn.bachelor_thesis.util.ValidationUtil.validateNewAppoi
 
 @Service
 public class AppointmentService {
-    private AppointmentRepository appointmentRepository;
-    private GroupService groupService;
-    private PlayerService playerService;
-    private GameRepository gameRepository;
-    private PlayerRepository playerRepository;
-    private AppointmentMapper appointmentMapper;
+    private final AppointmentRepository appointmentRepository;
+    private final GroupService groupService;
+    private final PlayerService playerService;
+    private final GameRepository gameRepository;
+    private final PlayerRepository playerRepository;
+    private final AppointmentMapper appointmentMapper;
 
     public AppointmentService(AppointmentRepository appointmentRepository,
                               GroupService groupService,

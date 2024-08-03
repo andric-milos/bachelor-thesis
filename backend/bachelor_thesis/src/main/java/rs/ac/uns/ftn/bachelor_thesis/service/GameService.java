@@ -16,7 +16,7 @@ import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.
 
 @Service
 public class GameService {
-    private GameRepository gameRepository;
+    private final GameRepository gameRepository;
 
     public GameService(GameRepository gameRepository) {
         this.gameRepository = gameRepository;

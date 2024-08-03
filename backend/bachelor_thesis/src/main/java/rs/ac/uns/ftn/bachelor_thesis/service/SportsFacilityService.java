@@ -19,9 +19,9 @@ import static rs.ac.uns.ftn.bachelor_thesis.util.ValidationUtil.validateSportsFa
 
 @Service
 public class SportsFacilityService {
-    private ManagerRepository managerRepository;
-    private SportsFacilityRepository sportsFacilityRepository;
-    private ManagerService managerService;
+    private final ManagerRepository managerRepository;
+    private final SportsFacilityRepository sportsFacilityRepository;
+    private final ManagerService managerService;
 
     public SportsFacilityService(ManagerRepository managerRepository,
                                  SportsFacilityRepository sportsFacilityRepository,
