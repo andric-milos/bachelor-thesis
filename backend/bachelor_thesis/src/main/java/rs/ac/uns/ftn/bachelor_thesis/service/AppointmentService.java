@@ -9,17 +9,34 @@ import rs.ac.uns.ftn.bachelor_thesis.dto.GameBasicInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.NewAppointmentDTO;
 import rs.ac.uns.ftn.bachelor_thesis.enumeration.AppointmentPrivacy;
 import rs.ac.uns.ftn.bachelor_thesis.enumeration.TeamColor;
-import rs.ac.uns.ftn.bachelor_thesis.exception.*;
+import rs.ac.uns.ftn.bachelor_thesis.exception.CustomizableBadRequestException;
+import rs.ac.uns.ftn.bachelor_thesis.exception.InternalServerErrorException;
+import rs.ac.uns.ftn.bachelor_thesis.exception.InvalidInputDataException;
+import rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException;
+import rs.ac.uns.ftn.bachelor_thesis.exception.UnauthorizedException;
 import rs.ac.uns.ftn.bachelor_thesis.mapper.AppointmentMapper;
-import rs.ac.uns.ftn.bachelor_thesis.model.*;
+import rs.ac.uns.ftn.bachelor_thesis.model.Appointment;
+import rs.ac.uns.ftn.bachelor_thesis.model.Game;
+import rs.ac.uns.ftn.bachelor_thesis.model.Goal;
+import rs.ac.uns.ftn.bachelor_thesis.model.Group;
+import rs.ac.uns.ftn.bachelor_thesis.model.Location;
+import rs.ac.uns.ftn.bachelor_thesis.model.Player;
+import rs.ac.uns.ftn.bachelor_thesis.model.Team;
 import rs.ac.uns.ftn.bachelor_thesis.repository.AppointmentRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.GameRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.PlayerRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
 import static rs.ac.uns.ftn.bachelor_thesis.exception.ResourceNotFoundException.ResourceType.APPOINTMENT_ID;
+import static rs.ac.uns.ftn.bachelor_thesis.util.Constants.MAXIMUM_APPOINTMENT_CAPACITY;
+import static rs.ac.uns.ftn.bachelor_thesis.util.Constants.MINIMUM_APPOINTMENT_CAPACITY;
 import static rs.ac.uns.ftn.bachelor_thesis.util.ValidationUtil.validateCreateGameDTO;
 import static rs.ac.uns.ftn.bachelor_thesis.util.ValidationUtil.validateNewAppointmentDTO;
 
@@ -47,8 +64,13 @@ public class AppointmentService {
     }
 
     public AppointmentDTO createAppointment(NewAppointmentDTO dto) {
-        if (!validateNewAppointmentDTO(dto))
+        if (!validateNewAppointmentDTO(dto)) {
             throw new InvalidInputDataException("Invalid input of data!");
+        }
+
+        if (dto.getCapacity() < MINIMUM_APPOINTMENT_CAPACITY || dto.getCapacity() > MAXIMUM_APPOINTMENT_CAPACITY) {
+            throw new CustomizableBadRequestException(format("%d is not a valid appointment capacity!", dto.getCapacity()));
+        }
 
         Group group = groupService.getGroupById(dto.getGroupId());
 
@@ -60,8 +82,9 @@ public class AppointmentService {
             throw new UnauthorizedException("Unauthorized!");
         }
 
-        if (!group.getPlayers().contains(player))
+        if (!group.getPlayers().contains(player)) {
             throw new UnauthorizedException("You're not in the group!");
+        }
 
 
         Appointment newAppointment = new Appointment(

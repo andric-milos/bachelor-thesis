@@ -94,15 +94,17 @@ public class ValidationUtil {
 
     /**
      * Whitelisted values for privacy field are "PRIVATE" and "PUBLIC".
-     * Capacity must be: 2 < capacity < 14.
+     * Capacity: There is no need to check if the capacity is null because Java, when passing null instead
+     * of int, automatically maps that null as 0.
      * @param dto
      * @return true, if the received NewAppointmentDTO object is valid; false if it isn't.
      */
     public static boolean validateNewAppointmentDTO(NewAppointmentDTO dto) {
-        // Add a check for groupId?
-
-        /* This check is maybe redundant, because Java, when mapping fields passed within
-         * Request Body object, automatically checks if they fit the right format? */
+        if (dto.getGroupId() == null) {
+            return false;
+        }
+        
+        // The code receives date as Long (as milliseconds) -> checking if date can be created from those milliseconds
         try {
             Date date = new Date(dto.getDate());
         } catch (Exception e) {
@@ -116,12 +118,6 @@ public class ValidationUtil {
         try {
             AppointmentPrivacy.valueOf(dto.getPrivacy().toUpperCase());
         } catch (Exception e) {
-            return false;
-        }
-
-        /* There is no need to check if the capacity is null, because Java, when passing null instead
-         * of int, automatically maps that null as 0. */
-        if (dto.getCapacity() < 2 || dto.getCapacity() > 14) {
             return false;
         }
 
