@@ -23,85 +23,42 @@ class ValidationUtilTest {
     class trimAndValidateRegisterInfoTest {
         @Test
         void shouldReturnTrimmedObjectWhenAllFieldsAreValid() {
-            RegisterInfoDTO dto = new RegisterInfoDTO(
-                    "John",
-                    "Doe",
-                    "johndoe@gmail.com",
-                    "1234",
-                    "062454455",
-                    "player"
-            );
-
+            RegisterInfoDTO dto = buildValidRegisterInfoDtoObject();
             assertNotNull(trimAndValidateRegisterInfo(dto));
         }
 
         @Test
         void shouldReturnNullWhenFirstNameIsEmptyString() {
-            RegisterInfoDTO dto = new RegisterInfoDTO(
-                    "",
-                    "Doe",
-                    "johndoe@gmail.com",
-                    "1234",
-                    "062454455",
-                    "player"
-            );
-
+            RegisterInfoDTO dto = buildValidRegisterInfoDtoObject();
+            dto.setFirstName("");
             assertNull(trimAndValidateRegisterInfo(dto));
         }
 
         @Test
         void shouldReturnNullWhenFirstNameIsNull() {
-            RegisterInfoDTO dto = new RegisterInfoDTO(
-                    null,
-                    "Doe",
-                    "johndoe@gmail.com",
-                    "1234",
-                    "062454455",
-                    "player"
-            );
-
+            RegisterInfoDTO dto = buildValidRegisterInfoDtoObject();
+            dto.setFirstName(null);
             assertNull(trimAndValidateRegisterInfo(dto));
         }
 
         @Test
         void shouldReturnNullWhenEmailIsNotValid() {
-            RegisterInfoDTO dto = new RegisterInfoDTO(
-                    "John",
-                    "Doe",
-                    "johndoe.gmail.com",
-                    "1234",
-                    "062454455",
-                    "player"
-            );
-
+            RegisterInfoDTO dto = buildValidRegisterInfoDtoObject();
+            dto.setEmail("johndoe.gmail.com");
             assertNull(trimAndValidateRegisterInfo(dto));
         }
 
         @Test
         void shouldReturnNullWhenTelephoneIsNotValid() {
-            RegisterInfoDTO dto = new RegisterInfoDTO(
-                    "John",
-                    "Doe",
-                    "johndoe@gmail.com",
-                    "1234",
-                    "062",
-                    "player"
-            );
-
+            RegisterInfoDTO dto = buildValidRegisterInfoDtoObject();
+            dto.setTelephone("062");
             assertNull(trimAndValidateRegisterInfo(dto));
         }
 
         @Test
         void shouldReturnTrimmedObjectWhenRoleIsNotValid() {
-            RegisterInfoDTO dto = new RegisterInfoDTO(
-                    "John",
-                    "Doe",
-                    "johndoe@gmail.com",
-                    "1234",
-                    "062237936",
-                    "invalidRole"
-            );
-
+            RegisterInfoDTO dto = buildValidRegisterInfoDtoObject();
+            dto.setRole("invalidRole");
             assertNotNull(trimAndValidateRegisterInfo(dto));
         }
     }
@@ -200,6 +157,17 @@ class ValidationUtilTest {
             dto.setPrice(-5000.0);
             assertFalse(validateNewAppointmentDTO(dto));
         }
+    }
+
+    private RegisterInfoDTO buildValidRegisterInfoDtoObject() {
+        return new RegisterInfoDTO(
+                "John",
+                "Doe",
+                "johndoe@gmail.com",
+                "1234",
+                "062454455",
+                "player"
+        );
     }
 
     private NewAppointmentDTO buildValidNewAppointmentDtoObject() {

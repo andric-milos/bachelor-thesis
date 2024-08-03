@@ -75,6 +75,7 @@ public class ValidationUtil {
      * Loops through the whole list of passed player's emails and for every email
      * checks if it fits a required pattern. Also, checks if the name of the group
      * is a valid string.
+     *
      * @param dto
      * @return false, if the CreateGroupDTO object is not valid, true if it is valid.
      */
@@ -96,6 +97,7 @@ public class ValidationUtil {
      * Whitelisted values for privacy field are "PRIVATE" and "PUBLIC".
      * Capacity: There is no need to check if the capacity is null because Java, when passing null instead
      * of int, automatically maps that null as 0.
+     *
      * @param dto
      * @return true, if the received NewAppointmentDTO object is valid; false if it isn't.
      */
@@ -103,7 +105,7 @@ public class ValidationUtil {
         if (dto.getGroupId() == null) {
             return false;
         }
-        
+
         // The code receives date as Long (as milliseconds) -> checking if date can be created from those milliseconds
         try {
             Date date = new Date(dto.getDate());
@@ -132,6 +134,7 @@ public class ValidationUtil {
      * Checks whether the received CreateGameDTO object is valid - teams must not be empty,
      * player can't be in both teams, emails must match the pattern, team color value must be valid.
      * Whitelisted values for goal->teamColor are: "RED" and "BLUE";
+     *
      * @param dto
      * @return true, if the received object is valid, false if it is not.
      */
@@ -145,7 +148,7 @@ public class ValidationUtil {
         }
 
         if (Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).distinct().count() <
-            Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).count()) {
+                Stream.concat(dto.getTeamRed().stream(), dto.getTeamBlue().stream()).count()) {
             return false;
         }
 
