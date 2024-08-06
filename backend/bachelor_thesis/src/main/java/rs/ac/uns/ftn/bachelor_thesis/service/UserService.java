@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.bachelor_thesis.dto.LoginInfoDTO;
 import rs.ac.uns.ftn.bachelor_thesis.dto.RegisterInfoDTO;
@@ -21,9 +22,12 @@ import rs.ac.uns.ftn.bachelor_thesis.repository.RoleRepository;
 import rs.ac.uns.ftn.bachelor_thesis.repository.UserRepository;
 import rs.ac.uns.ftn.bachelor_thesis.security.TokenUtil;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static rs.ac.uns.ftn.bachelor_thesis.util.ValidationUtil.trimAndValidateRegisterInfo;
 
 @Service
@@ -75,7 +79,7 @@ public class UserService{
     }
 
     public TokensDTO login(LoginInfoDTO dto, String issuer) {
-        log.info("Email: {}, Password: {}", dto.getEmail(), dto.getPassword());
+        log.info("Email: {}, Password: {}", dto.getEmail(), dto.getPassword()); // Shouldn't be logging password!
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -124,13 +128,28 @@ public class UserService{
 
         String email = dto.getEmail();
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new CustomizableBadRequestException(String.format("Email %s is already taken!", email));
+            throw new CustomizableBadRequestException(format("Email %s is already taken!", email));
         }
 
         // Role whitelisted values: "manager", "player"
         String role = dto.getRole();
         if (role.equals("player")) return new UserDTO(playerService.registerPlayer(dto));
         else if (role.equals("manager")) return new UserDTO(managerService.registerManager(dto));
-        else throw new CustomizableBadRequestException(String.format("Role %s doesn't exist!", role));
+        else throw new CustomizableBadRequestException(format("Role %s doesn't exist!", role));
+    }
+
+    public String getEmailOfLoggedInUser() {
+        log.info("Getting logged in user's email");
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String email;
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else {
+            email = (String) principal;
+        }
+
+        log.info(format("Logged in user's email: %s", email));
+        return email;
     }
 }

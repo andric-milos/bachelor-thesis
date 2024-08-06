@@ -48,19 +48,22 @@ public class AppointmentService {
     private final GameRepository gameRepository;
     private final PlayerRepository playerRepository;
     private final AppointmentMapper appointmentMapper;
+    private final UserService userService;
 
     public AppointmentService(AppointmentRepository appointmentRepository,
                               GroupService groupService,
                               PlayerService playerService,
                               GameRepository gameRepository,
                               PlayerRepository playerRepository,
-                              AppointmentMapper appointmentMapper) {
+                              AppointmentMapper appointmentMapper,
+                              UserService userService) {
         this.appointmentRepository = appointmentRepository;
         this.groupService = groupService;
         this.playerService = playerService;
         this.gameRepository = gameRepository;
         this.playerRepository = playerRepository;
         this.appointmentMapper = appointmentMapper;
+        this.userService = userService;
     }
 
     public AppointmentDTO createAppointment(NewAppointmentDTO dto) {
@@ -74,7 +77,7 @@ public class AppointmentService {
 
         Group group = groupService.getGroupById(dto.getGroupId());
 
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userService.getEmailOfLoggedInUser();
         Player player;
         try {
             player = playerService.getPlayerByEmail(email);
