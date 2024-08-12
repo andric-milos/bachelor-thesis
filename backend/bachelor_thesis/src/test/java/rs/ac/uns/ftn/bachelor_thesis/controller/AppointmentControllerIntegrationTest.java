@@ -70,7 +70,7 @@ public class AppointmentControllerIntegrationTest {
         @Rollback
 //        @WithMockUser(username = "player@example.com", roles = { "PLAYER" }) // using @WithMockUser is an alternative to logging in with mockMvc
         void shouldReturn200AndSuccessfullyCreateANewAppointmentWhenRequestDtoIsValid() throws Exception {
-            TokensDTO tokensDTO = loginAsPlayer();
+            TokensDTO tokensDTO = loginAs(TypeOfUser.PLAYER);
 
             NewAppointmentDTO dto = buildValidNewAppointmentDtoObject();
             MvcResult result = mockMvc.perform(post(BASE_URL)
@@ -88,7 +88,7 @@ public class AppointmentControllerIntegrationTest {
         // TODO: add tests when request dto is invalid
         @Test
         void shouldReturn404NotFoundWhenGroupIdIsNotExistingInTheDatabase() throws Exception {
-            String accessToken = loginAsPlayer().getAccessToken();
+            String accessToken = loginAs(TypeOfUser.PLAYER).getAccessToken();
 
             NewAppointmentDTO dto = buildValidNewAppointmentDtoObject();
             dto.setGroupId(NON_EXISTING_GROUP_ID);
@@ -112,7 +112,7 @@ public class AppointmentControllerIntegrationTest {
 
         @Test
         void shouldReturn400BadRequestWhenPrivacyNotValid() throws Exception {
-            String accessToken = loginAsPlayer().getAccessToken();
+            String accessToken = loginAs(TypeOfUser.PLAYER).getAccessToken();
 
             NewAppointmentDTO dto = buildValidNewAppointmentDtoObject();
             dto.setPrivacy("invalid privacy value");
@@ -126,7 +126,7 @@ public class AppointmentControllerIntegrationTest {
 
         @Test
         void shouldReturn403ForbiddenWhenLoggedInAsManager() throws Exception {
-            String accessToken = loginAsManager().getAccessToken();
+            String accessToken = loginAs(TypeOfUser.MANAGER).getAccessToken();
 
             NewAppointmentDTO dto = buildValidNewAppointmentDtoObject();
             mockMvc.perform(post(BASE_URL)
@@ -149,8 +149,14 @@ public class AppointmentControllerIntegrationTest {
         return dto;
     }
 
-    private TokensDTO loginAsPlayer() throws Exception {
-        LoginInfoDTO loginInfoDTO = new LoginInfoDTO("andric8@gmail.com", "1234");
+    private TokensDTO loginAs(TypeOfUser typeOfUser) throws Exception {
+        String username = "";
+        switch (typeOfUser) {
+            case PLAYER -> username = "andric8@gmail.com";
+            case MANAGER -> username = "ninapetkovic@gmail.com";
+        }
+
+        LoginInfoDTO loginInfoDTO = new LoginInfoDTO(username, "1234");
         String response = mockMvc.perform(post("/user/login")
                         .contentType(CONTENT_TYPE_JSON)
                         .content(objectMapper.writeValueAsString(loginInfoDTO)))
@@ -158,12 +164,7 @@ public class AppointmentControllerIntegrationTest {
         return objectMapper.readValue(response, TokensDTO.class);
     }
 
-    private TokensDTO loginAsManager() throws Exception {
-        LoginInfoDTO loginInfoDTO = new LoginInfoDTO("ninapetkovic@gmail.com", "1234");
-        String response = mockMvc.perform(post("/user/login")
-                        .contentType(CONTENT_TYPE_JSON)
-                        .content(objectMapper.writeValueAsString(loginInfoDTO)))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        return objectMapper.readValue(response, TokensDTO.class);
+    private enum TypeOfUser {
+        PLAYER, MANAGER
     }
 }
