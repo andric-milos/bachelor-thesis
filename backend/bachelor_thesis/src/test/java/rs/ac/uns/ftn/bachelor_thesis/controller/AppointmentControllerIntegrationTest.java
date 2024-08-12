@@ -29,6 +29,8 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,6 +45,7 @@ public class AppointmentControllerIntegrationTest {
             MediaType.APPLICATION_JSON.getSubtype()
     );
     private final String BEARER_FORMAT_STRING = "Bearer %s";
+    private final Long NON_EXISTING_GROUP_ID = 10000L;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -56,7 +59,7 @@ public class AppointmentControllerIntegrationTest {
 
     @BeforeEach
     void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
     }
 
     @Nested
@@ -83,7 +86,55 @@ public class AppointmentControllerIntegrationTest {
         }
 
         // TODO: add tests when request dto is invalid
-        // TODO: add a test when authentication is unsuccessful
+        @Test
+        void shouldReturn404NotFoundWhenGroupIdIsNotExistingInTheDatabase() throws Exception {
+            String accessToken = loginAsPlayer().getAccessToken();
+
+            NewAppointmentDTO dto = buildValidNewAppointmentDtoObject();
+            dto.setGroupId(NON_EXISTING_GROUP_ID);
+
+            mockMvc.perform(post(BASE_URL)
+                            .contentType(CONTENT_TYPE_JSON)
+                            .content(objectMapper.writeValueAsString(dto))
+                            .header(AUTHORIZATION, format(BEARER_FORMAT_STRING, accessToken)))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void shouldReturn403ForbiddenWhenNotAuthenticated() throws Exception { // TODO: return 401 Unauthorized for unauthorized requests
+            NewAppointmentDTO dto = buildValidNewAppointmentDtoObject();
+            mockMvc.perform(post(BASE_URL)
+                    .with(anonymous()) // this line is unnecessary (it works without it)
+                    .contentType(CONTENT_TYPE_JSON)
+                    .content(objectMapper.writeValueAsString(dto)))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void shouldReturn400BadRequestWhenPrivacyNotValid() throws Exception {
+            String accessToken = loginAsPlayer().getAccessToken();
+
+            NewAppointmentDTO dto = buildValidNewAppointmentDtoObject();
+            dto.setPrivacy("invalid privacy value");
+
+            mockMvc.perform(post(BASE_URL)
+                            .contentType(CONTENT_TYPE_JSON)
+                            .content(objectMapper.writeValueAsString(dto))
+                            .header(AUTHORIZATION, format(BEARER_FORMAT_STRING, accessToken)))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void shouldReturn403ForbiddenWhenLoggedInAsManager() throws Exception {
+            String accessToken = loginAsManager().getAccessToken();
+
+            NewAppointmentDTO dto = buildValidNewAppointmentDtoObject();
+            mockMvc.perform(post(BASE_URL)
+                            .contentType(CONTENT_TYPE_JSON)
+                            .content(objectMapper.writeValueAsString(dto))
+                            .header(AUTHORIZATION, format(BEARER_FORMAT_STRING, accessToken)))
+                    .andExpect(status().isForbidden());
+        }
     }
 
     private NewAppointmentDTO buildValidNewAppointmentDtoObject() {
@@ -100,6 +151,15 @@ public class AppointmentControllerIntegrationTest {
 
     private TokensDTO loginAsPlayer() throws Exception {
         LoginInfoDTO loginInfoDTO = new LoginInfoDTO("andric8@gmail.com", "1234");
+        String response = mockMvc.perform(post("/user/login")
+                        .contentType(CONTENT_TYPE_JSON)
+                        .content(objectMapper.writeValueAsString(loginInfoDTO)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        return objectMapper.readValue(response, TokensDTO.class);
+    }
+
+    private TokensDTO loginAsManager() throws Exception {
+        LoginInfoDTO loginInfoDTO = new LoginInfoDTO("ninapetkovic@gmail.com", "1234");
         String response = mockMvc.perform(post("/user/login")
                         .contentType(CONTENT_TYPE_JSON)
                         .content(objectMapper.writeValueAsString(loginInfoDTO)))
