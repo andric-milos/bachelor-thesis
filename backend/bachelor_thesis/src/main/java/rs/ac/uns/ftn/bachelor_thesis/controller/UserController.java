@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @GetMapping("/whoami")
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_MANAGER')")
+    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_MANAGER')") // It doesn't make sense to have a @PreAuthorize here.
     public ResponseEntity<UserDTO> whoAmI() {
         return new ResponseEntity<>(userService.whoAmI(), HttpStatus.OK);
     }

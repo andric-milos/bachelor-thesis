@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter { // Update the SecurityConfig class, since the WebSecurityConfigurerAdapter class is deprecated
     private final CustomUserDetailsService customUserDetailsService;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -43,4 +43,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean(), tokenUtil));
         http.addFilterBefore(new CustomAuthorizationFilter(tokenUtil), UsernamePasswordAuthenticationFilter.class);
     }
+
+    // TODO: refactor the SecurityConfiguration class to ignore the GET /appointment endpoint (to not require authentication for it)
 }
