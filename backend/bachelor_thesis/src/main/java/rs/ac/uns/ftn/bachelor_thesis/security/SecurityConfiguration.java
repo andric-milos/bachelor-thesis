@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -44,5 +45,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter { // Upd
         http.addFilterBefore(new CustomAuthorizationFilter(tokenUtil), UsernamePasswordAuthenticationFilter.class);
     }
 
-    // TODO: refactor the SecurityConfiguration class to ignore the GET /appointment endpoint (to not require authentication for it)
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+//        web.ignoring().antMatchers(HttpMethod.GET, "/appointment");
+        web.ignoring().antMatchers("/user/**");
+    }
 }

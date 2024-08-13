@@ -111,7 +111,9 @@ public class UserService{
     }
 
     public UserDTO whoAmI() {
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("Getting logged in user's info");
+
+        String email = getEmailOfLoggedInUser();
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new UnauthorizedException("Not logged in!")
         );
@@ -140,7 +142,13 @@ public class UserService{
 
     public String getEmailOfLoggedInUser() {
         log.info("Getting logged in user's email");
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new UnauthorizedException("Not logged in!");
+        }
+
+        Object principal = authentication.getPrincipal();
 
         String email;
         if (principal instanceof UserDetails) {

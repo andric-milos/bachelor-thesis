@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -58,7 +59,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
                     filterChain.doFilter(request, response);
                 } catch (Exception e) {
-                    log.error("Error logging in: {}", e.getMessage());
+                    log.error("Error logging in for request {}: {}", request.getRequestURL(), e.getMessage());
 
                     e.printStackTrace();
 
